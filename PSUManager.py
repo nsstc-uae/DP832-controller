@@ -1,6 +1,10 @@
 #unfinished file
 import datetime
 import time, sys
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
+
 
 class Settings:
     voltage = 0.0
@@ -32,6 +36,7 @@ class Settings:
     def setOCP(self,ocp):
         self.ocp=ocp
 
+
 class PlotParameters:
     voltage =0.0
     current =0.0
@@ -42,23 +47,36 @@ class PlotParameters:
 
 
 class Plot:
-    time= datetime
-    parameters=PlotParameters
-    def _init_(self, time , parameters):
-        self.time=time
-        self.parameters=parameters
-    def plotBase(self):
-        pass
+    style.use('fivethirtyeight')
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1, 1, 1)
+    id=1
+    def _init_(self, id):
+        self.id=id
+
+    def animate(self):
+        graph_data = open('Channel'+self.id+'.txt', 'r').read()
+        lines = graph_data.split('\n')
+        xs = []
+        ys = []
+        for line in lines:
+            if len(line) > 1:
+                x, y = line.split(',')
+                xs.append(float(x))
+                ys.append(float(y))
+        self.ax1.clear()
+        self.ax1.plot(xs, ys)
     def startPlot(self):
-        pass
-    def plotChange(self):
-        pass
-    def stopPlot(self):
-        pass
+        ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
+        plt.show()
+
     def savePlot(self):
-        pass
-
-
+        fn = "PlotChannel"+self.id+" "+datetime.datetime.now()+".txt"
+        f = open(fn, "w")
+        with open("Channel"+self.id+".txt", 'r') as f:
+            for line in f:
+                f.write(line)
+        f.close()
 
 
 class Channel:
@@ -66,8 +84,6 @@ class Channel:
     userSettings = Settings
     lastAppliedSettings = Settings
     readingsSettings = Settings
-    #plotParameters =PlotParameters
-    #plot=Plot
 
     def _init_(self, id, userSettings):
         self.id=id
@@ -159,6 +175,19 @@ class Channel:
         ocp = self.myread()
         self.readingsSettings.setOCP(ocp)
 
+    def writeFilePlot(self):
+        fn = "Channel"+id+".txt"
+        f = open(fn, "w")
+        f.write(datetime.datetime.now().time()+","+self.readingsSettings.getCurr())
+        f.close()
+
+    def startPlot(self):
+        state = True
+        while state:
+            self.writeFilePlot()
+            time.sleep(5)
+        p = Plot(id)
+        p.startPlot()
 
 
 
