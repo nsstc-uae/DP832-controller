@@ -99,11 +99,16 @@ class Channel:
         ocp = self.myread()
         self.readingsSettings.setOCP(ocp)
 
+    def getuserSettings(self,Settings):
+        self.userSettings = Settings
     def setuserSettings(self):
         self.uservoltage()
         self.usercurrent()
         self.userOCP()
         self.userOVP()
+
+    def getreadingsSettings(self):
+        return self.readingsSettings
 
     def writeFilePlot(self):
         state = True
