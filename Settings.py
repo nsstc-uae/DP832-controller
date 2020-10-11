@@ -27,3 +27,8 @@ class Settings:
         self.ovp=ovp
     def setOCP(self,ocp):
         self.ocp=ocp
+    def setALL(self,v,c,ovp,ocp):
+        self.ocp = ocp
+        self.ovp = ovp
+        self.current = c
+        self.voltage = v
