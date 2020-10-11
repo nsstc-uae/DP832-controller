@@ -4,6 +4,7 @@ import time, sys
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
+from multiprocessing import Process
 
 
 class Settings:
@@ -176,16 +177,16 @@ class Channel:
         self.readingsSettings.setOCP(ocp)
 
     def writeFilePlot(self):
-        fn = "Channel"+id+".txt"
-        f = open(fn, "w")
-        f.write(datetime.datetime.now().time()+","+self.readingsSettings.getCurr())
+        state = True
+        while state:
+            fn = "Channel"+id+".txt"
+            f = open(fn, "w")
+            f.write(datetime.datetime.now().time()+","+self.readingsSettings.getCurr())
+            time.sleep(5)
         f.close()
 
     def startPlot(self):
-        state = True
-        while state:
-            self.writeFilePlot()
-            time.sleep(5)
+        Process(target=self.writeFilePlot().start())  # start now
         p = Plot(id)
         p.startPlot()
 
