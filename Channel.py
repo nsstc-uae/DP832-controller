@@ -79,28 +79,28 @@ class Channel:
         self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(id)))
         print(':MEAS:VOLT? CH{channel}'.format(channel=int(id)))
         volt = self.myread()
-        self.readingsSettings.setVolt(volt)
+        self.readingsSettings.Settings.setVolt(volt)
 
     def readCurrent(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(id)))
         self.mywrite(':MEAS:CURR? CH{channel}'.format(channel=int(id)))
         current = self.myread()
-        self.readingsSettings.setCurr(current)
+        self.readingsSettings.Settings.setCurr(current)
 
     def readovp(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(id)))
         self.mywrite(':MEAS:VOLT:PROT:? CH{channel}'.format(channel=int(id)))
         ovp = self.myread()
-        self.readingsSettings.setOVP(ovp)
+        self.readingsSettings.Settings.setOVP(ovp)
 
     def readocp(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(id)))
         self.mywrite(':MEAS:CURR:PROT:? CH{channel}'.format(channel=int(id)))
         ocp = self.myread()
-        self.readingsSettings.setOCP(ocp)
+        self.readingsSettings.Settings.setOCP(ocp)
 
-    def getuserSettings(self,Settings):
-        self.userSettings = Settings
+    def getuserSettings(self,settings):
+        self.userSettings = settings
     def setuserSettings(self):
         self.uservoltage()
         self.usercurrent()
@@ -108,6 +108,10 @@ class Channel:
         self.userOVP()
 
     def getreadingsSettings(self):
+        self.readCurrent()
+        self.readocp()
+        self.readVolt()
+        self.readovp()
         return self.readingsSettings
 
     def writeFilePlot(self):
@@ -122,7 +126,7 @@ class Channel:
     def startPlot(self):
         Process(target=self.writeFilePlot().start())  # start now
         p = Plot(id)#start at the same time
-        p.startPlot()#start after plot
+        p.Plot.startPlot()#start after plot
 
 
 
