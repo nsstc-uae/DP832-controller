@@ -67,19 +67,18 @@ class PSUManager:
 
         readings = [readCH1, readCH2, readCH3]
         return readings
-    def userinput(self,v,c,ovp,ocp,id):
-        if id == 1:
-            self.userSettingsCH1.setAll(v,c,ovp,ocp)
-        if id==2:
-            self.userSettingsCH2.setAll(v,c,ovp,ocp)
-        if id ==3:
-            self.userSettingsCH3.setAll(v, c, ovp, ocp)
     def plot(self):
         pass
-    def configureChannel(self):
-        self.channel01.setuserSettings()
-        self.channel02.setuserSettings()
-        self.channel03.setuserSettings()
+    def configureChannel(self,v,c,ovp,ocp,id):
+        if id == 1:
+            self.userSettingsCH1.setAll(v, c, ovp, ocp)
+            self.channel01.setuserSettings()
+        if id == 2:
+            self.userSettingsCH2.setAll(v, c, ovp, ocp)
+            self.channel02.setuserSettings()
+        if id == 3:
+            self.userSettingsCH3.setAll(v, c, ovp, ocp)
+            self.channel03.setuserSettings()
 
     def sendToDB(self):
         pass
