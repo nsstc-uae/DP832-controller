@@ -1,13 +1,15 @@
-import Plot
-import Settings
+import Plot as p
+import Settings as s
 import datetime
 import time, sys
 from multiprocessing import Process
 class Channel:
     id =1
-    userSettings = Settings
-    lastAppliedSettings = Settings
-    readingsSettings = Settings
+    userSettings = s.Settings()
+    lastAppliedSettings = s.Settings()
+    readingsSettings = s.Settings()
+    fpwrite=None
+    fpread=None
 
     def _init_(self, id, userSettings):
         self.id=id
@@ -38,7 +40,11 @@ class Channel:
     def close_instrument(self):
         self.fpwrite.close()
 
-    def set_bias(self, channel=1, i=0.1, i_protection_level=0.1, v_protection_level=0.9, v=0.5):
+    def set_bias(self, channel):
+        i = 0.1
+        i_protection_level = 0.1
+        v_protection_level = 0.9
+        v = 0.5
         self.mywrite(':INST CH{channel}'.format(channel=int(channel)))
         self.mywrite(':CURR {i}'.format(i=i))
         self.mywrite(':CURR:PROT {i_level}'.format(i_level=i_protection_level))
@@ -56,48 +62,48 @@ class Channel:
         self.mywrite(':OUTP CH{channel},ON'.format(channel=channel))
 
     def uservoltage(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':VOLT {0}'.format(self.userSettings.getVolt()))
 
     def usercurrent(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':CURR {c}'.format(c=self.userSettings.getCurr()))
 
     def userOVP(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':VOLT:PROT {ovp}'.format(self.userSettings.getOVP()))
         self.mywrite(':VOLT:PROT:STAT ON')
 
     def userOCP(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':CURR:PROT {ocp}'.format(ocp=self.userSettings.getOCP()))
         self.mywrite(':CURR:PROT:STAT ON')
 
 
     def readVolt(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
-        self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(id)))
-        print(':MEAS:VOLT? CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
+        self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
+        print(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
         volt = self.myread()
-        self.readingsSettings.Settings.setVolt(volt)
+        self.readingsSettings.setVolt(volt)
 
     def readCurrent(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
-        self.mywrite(':MEAS:CURR? CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
+        self.mywrite(':MEAS:CURR? CH{channel}'.format(channel=int(self.id)))
         current = self.myread()
-        self.readingsSettings.Settings.setCurr(current)
+        self.readingsSettings.setCurr(current)
 
     def readovp(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
-        self.mywrite(':MEAS:VOLT:PROT:? CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
+        self.mywrite(':MEAS:VOLT:PROT:? CH{channel}'.format(channel=int(self.id)))
         ovp = self.myread()
-        self.readingsSettings.Settings.setOVP(ovp)
+        self.readingsSettings.setOVP(ovp)
 
     def readocp(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(id)))
-        self.mywrite(':MEAS:CURR:PROT:? CH{channel}'.format(channel=int(id)))
+        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
+        self.mywrite(':MEAS:CURR:PROT:? CH{channel}'.format(channel=int(self.id)))
         ocp = self.myread()
-        self.readingsSettings.Settings.setOCP(ocp)
+        self.readingsSettings.setOCP(ocp)
 
     def getuserSettings(self,settings):
         self.userSettings = settings
@@ -117,7 +123,7 @@ class Channel:
     def writeFilePlot(self):
         state = True
         while state:
-            fn = "Channel"+id+".txt"
+            fn = "Channel"+self.id+".txt"
             f = open(fn, "w")
             f.write(datetime.datetime.now().time()+","+self.readingsSettings.getCurr())
             time.sleep(5)
@@ -125,8 +131,8 @@ class Channel:
 
     def startPlot(self):
         Process(target=self.writeFilePlot().start())  # start now
-        p = Plot(id)#start at the same time
-        p.Plot.startPlot()#start after plot
+        myplot = p.Plot(self.id)#start at the same time
+        myplot.Plot.startPlot()#start after plot
 
 
 
