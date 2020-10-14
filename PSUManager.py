@@ -6,9 +6,9 @@ class PSUManager:
     userSettingsCH1 = s.Settings() #get value from UI later
     userSettingsCH2 = s.Settings()
     userSettingsCH3 = s.Settings()
-    userSettingsCH1.setAll(v=0,c=0,ovp=0,ocp=0)
-    userSettingsCH2.setAll(v=0,c=0,ovp=0,ocp=0)
-    userSettingsCH3.setAll(v=0,c=0,ovp=0,ocp=0)
+    userSettingsCH1.setAll(v=0,c=0,ovp=0.01,ocp=0.01)
+    userSettingsCH2.setAll(v=0,c=0,ovp=0.01,ocp=0.01)
+    userSettingsCH3.setAll(v=0.01,c=0.01,ovp=0.01,ocp=0.01)
 
     channel01 = c.Channel()
     channel02 = c.Channel()
@@ -76,12 +76,15 @@ class PSUManager:
     def configureChannel(self,v,c,ovp,ocp,id):
         if id == 1:
             self.userSettingsCH1.setAll(v, c, ovp, ocp)
+            self.channel01.getuserSettings(self.userSettingsCH1)
             self.channel01.setuserSettings()
         if id == 2:
             self.userSettingsCH2.setAll(v, c, ovp, ocp)
+            self.channel02.getuserSettings(self.userSettingsCH2)
             self.channel02.setuserSettings()
         if id == 3:
             self.userSettingsCH3.setAll(v, c, ovp, ocp)
+            self.channel03.getuserSettings(self.userSettingsCH3)
             self.channel03.setuserSettings()
 
     def sendToDB(self):
