@@ -6,13 +6,16 @@ class PSUManager:
     userSettingsCH1 = s.Settings() #get value from UI later
     userSettingsCH2 = s.Settings()
     userSettingsCH3 = s.Settings()
-    userSettingsCH1.setAll(v=0,c=0,ovp=0.01,ocp=0.01)
-    userSettingsCH2.setAll(v=0,c=0,ovp=0.01,ocp=0.01)
-    userSettingsCH3.setAll(v=0.01,c=0.01,ovp=0.01,ocp=0.01)
+    userSettingsCH1.setAll(v=0,c=0,ovp=0,ocp=0)
+    userSettingsCH2.setAll(v=0,c=0,ovp=0,ocp=0)
+    userSettingsCH3.setAll(v=0,c=0,ovp=0,ocp=0)
 
     channel01 = c.Channel()
+    channel01.setID(1)
     channel02 = c.Channel()
+    channel02.setID(2)
     channel03 = c.Channel()
+    channel03.setID(3)
 
     def _init_(self):
         pass
@@ -20,20 +23,21 @@ class PSUManager:
     def initUI(self):
         pass
     def initChannels(self,devic):
+        self.channel01.conn(devic)
+        self.channel02.conn(devic)
+        self.channel03.conn(devic)
 
         self.channel01.reset()
         self.channel03.reset()
         self.channel02.reset()
 
-        self.channel01.conn(devic)
         self.channel01.set_bias(channel=1)
         self.channel01.getuserSettings(self.userSettingsCH1)
 
-        self.channel02.conn(devic)
+
         self.channel02.set_bias(channel=2)
         self.channel02.getuserSettings(self.userSettingsCH2)
 
-        self.channel03.conn(devic)
         self.channel03.set_bias(channel=3)
         self.channel03.getuserSettings(self.userSettingsCH3)
 
@@ -70,21 +74,20 @@ class PSUManager:
             readCH3 = self.channel03.getreadingsSettings()
 
         readings = [readCH1, readCH2, readCH3]
+
         return readings
     def plot(self):
         pass
+
     def configureChannel(self,v,c,ovp,ocp,id):
         if id == 1:
             self.userSettingsCH1.setAll(v, c, ovp, ocp)
-            self.channel01.getuserSettings(self.userSettingsCH1)
             self.channel01.setuserSettings()
         if id == 2:
             self.userSettingsCH2.setAll(v, c, ovp, ocp)
-            self.channel02.getuserSettings(self.userSettingsCH2)
             self.channel02.setuserSettings()
         if id == 3:
             self.userSettingsCH3.setAll(v, c, ovp, ocp)
-            self.channel03.getuserSettings(self.userSettingsCH3)
             self.channel03.setuserSettings()
 
     def sendToDB(self):
