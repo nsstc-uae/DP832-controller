@@ -1,4 +1,4 @@
-import Plot as p
+# import Plot as p
 import Settings as s
 import datetime
 import time, sys
@@ -6,7 +6,7 @@ from multiprocessing import Process
 class Channel:
     id =1
     userSettings = s.Settings()
-    lastAppliedSettings = s.Settings()
+    #lastAppliedSettings = s.Settings()
     readingsSettings = s.Settings()
     fpwrite=None
     fpread=None
@@ -14,6 +14,9 @@ class Channel:
     def _init_(self, id, userSettings):
         self.id=id
         self.userSettings=userSettings
+
+    def setID(self,ID):
+        self.id=ID
 
     """Attempt to connect to instrument via files"""
     def conn(self,device):
@@ -79,6 +82,12 @@ class Channel:
         self.mywrite(':CURR:PROT {ocp}'.format(ocp=self.userSettings.getOCP()))
         self.mywrite(':CURR:PROT:STAT ON')
 
+    def ocpOFF(self):
+        self.mywrite(':CURR:PROT:STAT OFF')
+
+    def ovpOFF(self):
+        self.mywrite(':VOLT:PROT:STAT OFF')
+
 
     def readVolt(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
@@ -129,10 +138,10 @@ class Channel:
             time.sleep(5)
         f.close()
 
-    def startPlot(self):
-        Process(target=self.writeFilePlot().start())  # start now
-        myplot = p.Plot(self.id)#start at the same time
-        myplot.Plot.startPlot()#start after plot
+    # def startPlot(self):
+    #     Process(target=self.writeFilePlot().start())  # start now
+    #     myplot = p.Plot(self.id)#start at the same time
+    #     myplot.Plot.startPlot()#start after plot
 
 
 
