@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import *
-
+from multiprocessing import Process
 from main import *
 
 import PSUManager as psu
 # import Plot
-# import Settings
+import Settings as s
 # import Channel
 # import PlotParameters
 
@@ -21,7 +21,7 @@ class WindowUI(Ui_MainWindow):
         self.setupUi(window)
 
         ##PSUManager
-        self.psu.initChannels(devic="/dev/usbtmc0")
+        self.psu.initChannels(device="/dev/usbtmc0")
         ##SpinBox Configure
         self.voltageSP_ch1.setMaximum(30)
         self.voltageSP_ch2.setMaximum(30)
@@ -54,31 +54,57 @@ class WindowUI(Ui_MainWindow):
         ##Buttons
         self.browseBttn.clicked.connect(self.browseFiles)
         self.saveAsBttn.clicked.connect(self.saveAs)
-        self.applySelectedBttn.clicked.connect(self.applySelected)
         self.setBttn_ch1.clicked.connect(self.setCh1)
         self.setBttn_ch2.clicked.connect(self.setCh2)
         self.setBttn_ch3.clicked.connect(self.setCh3)
         self.switchBttn_channels.clicked.connect(self.switchChannels)
-    
+        #Process(target=self.readingOutput().start())
+        self.readingOutput()
+
+    def readingOutput(self):
+
+        readings = self.psu.readChannels()
+        self.voltageReadingField_ch1.setText(str(readings[0].getVolt()))
+        self.currentReadingField_ch1.setText(str(readings[0].getCurr()))
+        self.ocpCurrTF_ch1.setText(str(readings[0].getOCP()))
+        self.ovpVolTF_ch1.setText(str(readings[0].getOVP()))
+
+        self.voltageReadingField_ch2.setText(str(readings[1].getVolt()))
+        self.currentReadingField_ch2.setText(str(readings[1].getCurr()))
+        self.ocpCurrTF_ch2.setText(str(readings[1].getOCP()))
+        self.ovpVolTF_ch2.setText(str(readings[1].getOVP()))
+
+        print(readings)
+
+        self.voltageReadingField_ch3.setText(str(readings[2].getVolt()))
+        self.currentReadingField_ch3.setText(str(readings[2].getCurr()))
+        self.ocpCurrTF_ch3.setText(str(readings[2].getOCP()))
+        self.ovpVolTF_ch3.setText(str(readings[2].getOVP()))
+
     def switchChannels(self):
         if self.channel1_rBttn.isChecked():
+            self.psu.swichChannelOn(id=1)
             print("ch1 is on")
 
         if self.channel2_rBttn.isChecked():
+            self.psu.swichChannelOn(id=2)
             print("ch2 is on")
 
         if self.channel3_rBttn.isChecked():
+            self.psu.swichChannelOn(id=3)
             print("ch3 is on")
 
         if not self.channel1_rBttn.isChecked():
+            self.psu.swichChannelOff(id=1)
             print("ch1 is off")
 
         if not self.channel2_rBttn.isChecked():
+            self.psu.swichChannelOff(id=2)
             print("ch2 is off")
 
         if not self.channel3_rBttn.isChecked():
+            self.psu.swichChannelOff(id=3)
             print("ch3 is off")
-
 
     def browseFiles(self):
         fname = QFileDialog.getOpenFileNames(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
