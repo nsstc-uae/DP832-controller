@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 
 from main import *
 
-# import PSUManager as psu
+import PSUManager as psu
 # import Plot
 # import Settings
 # import Channel
@@ -14,21 +14,61 @@ import os
 
 
 class WindowUI(Ui_MainWindow):
-    # psu = psu.PSUManager()
+
+    psu = psu.PSUManager()
 
     def __init__(self, window):
         self.setupUi(window)
 
         ##PSUManager
-       # self.psu.initChannels()
+        self.psu.initChannels(devic="/dev/usbtmc0")
+        ##SpinBox Configure
+        self.voltageSP_ch1.setMaximum(30)
+        self.voltageSP_ch2.setMaximum(30)
+        self.voltageSP_ch3.setMaximum(5)
+
+        self.currentSP_ch1.setMaximum(3)
+        self.currentSP_ch2.setMaximum(3)
+        self.currentSP_ch3.setMaximum(3)
+
+        self.ovpVolSP_ch1.setMinimum(0.01)
+        self.ovpVolSP_ch2.setMinimum(0.01)
+        self.ovpVolSP_ch3.setMinimum(0.01)
+
+        self.ovpVolSP_ch1.setMaximum(33)
+        self.ovpVolSP_ch2.setMaximum(33)
+        self.ovpVolSP_ch3.setMaximum(5.5)
+
+        self.ocpCurrSP_ch1.setMinimum(0.001)
+        self.ocpCurrSP_ch2.setMinimum(0.001)
+        self.ocpCurrSP_ch3.setMinimum(0.001)
+
+        self.ocpCurrSP_ch1.setDecimals(3)
+        self.ocpCurrSP_ch2.setDecimals(3)
+        self.ocpCurrSP_ch3.setDecimals(3)
+
+        self.ocpCurrSP_ch1.setMaximum(3.3)
+        self.ocpCurrSP_ch2.setMaximum(3.3)
+        self.ocpCurrSP_ch3.setMaximum(3.3)
 
         ##Buttons
         self.browseBttn.clicked.connect(self.browseFiles)
         self.saveAsBttn.clicked.connect(self.saveAs)
         self.applySelectedBttn.clicked.connect(self.applySelected)
-        # self.setBttn_ch1.clicked.connect(self.setCh1)
-        # self.setBttn_ch2.clicked.connect(self.setCh2)
-        # self.setBttn_ch3.clicked.connect(self.setCh3)
+        self.setBttn_ch1.clicked.connect(self.setCh1)
+        self.setBttn_ch2.clicked.connect(self.setCh2)
+        self.setBttn_ch3.clicked.connect(self.setCh3)
+        self.switchBttn_channels.clicked.connect(self.switchChannels)
+
+    def switchChannels(self):
+        if self.channel1_rBttn.isChecked():
+            print("ch1 is on")
+
+        if self.channel2_rBttn.isChecked():
+            print("ch2 is on")
+
+        if self.channel2_rBttn.isChecked():
+            print("ch2 is on")
 
     def browseFiles(self):
         fname = QFileDialog.getOpenFileNames(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
@@ -119,21 +159,35 @@ class WindowUI(Ui_MainWindow):
     def applySelected(self):
         print("Apply selected")
 
-    # def setCh1(self):
-    #     chVol_1 = self.voltageSP_ch1.value()
-    #     chCurr_1 = self.currentSP_ch1.value()
-    #     chOVP_1 = self.ovpVolSP_ch1.value()
-    #     chOCP_1 = self.ocpCurrSP_ch1.value()
-    #     # configureChannel(self,v,c,ovp,ocp,id):
-    #
-    #     self.psu.configureChannel(chVol_1, chCurr_1, chOVP_1, chOCP_1, 1)
-    #     print("channel 1 have been set")
-    #
-    # def setCh2(self):
-    #     print("channel 2 have been set")
-    #
-    # def setCh3(self):
-    #     print("channel 3 have been set")
+    def setCh1(self):
+        chVol_1 = self.voltageSP_ch1.value()
+        chCurr_1 = self.currentSP_ch1.value()
+        chOVP_1 = self.ovpVolSP_ch1.value()
+        chOCP_1 = self.ocpCurrSP_ch1.value()
+        # configureChannel(self,v,c,ovp,ocp,id):
+
+        self.psu.configureChannel(chVol_1, chCurr_1, chOVP_1, chOCP_1, 1)
+        print("channel 1 have been set")
+
+    def setCh2(self):
+        chVol_2 = self.voltageSP_ch2.value()
+        chCurr_2 = self.currentSP_ch2.value()
+        chOVP_2 = self.ovpVolSP_ch2.value()
+        chOCP_2 = self.ocpCurrSP_ch2.value()
+        # configureChannel(self,v,c,ovp,ocp,id):
+
+        self.psu.configureChannel(chVol_2, chCurr_2, chOVP_2, chOCP_2, 2)
+        print("channel 2 have been set")
+
+    def setCh3(self):
+        chVol_3 = self.voltageSP_ch3.value()
+        chCurr_3 = self.currentSP_ch3.value()
+        chOVP_3 = self.ovpVolSP_ch3.value()
+        chOCP_3 = self.ocpCurrSP_ch3.value()
+        # configureChannel(self,v,c,ovp,ocp,id):
+
+        self.psu.configureChannel(chVol_3, chCurr_3, chOVP_3, chOCP_3, 3)
+        print("channel 3 have been set")
 
 
 app = QtWidgets.QApplication(sys.argv)
