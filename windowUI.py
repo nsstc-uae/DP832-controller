@@ -59,7 +59,7 @@ class WindowUI(Ui_MainWindow):
         self.setBttn_ch2.clicked.connect(self.setCh2)
         self.setBttn_ch3.clicked.connect(self.setCh3)
         self.switchBttn_channels.clicked.connect(self.switchChannels)
-
+    
     def switchChannels(self):
         if self.channel1_rBttn.isChecked():
             print("ch1 is on")
@@ -67,8 +67,18 @@ class WindowUI(Ui_MainWindow):
         if self.channel2_rBttn.isChecked():
             print("ch2 is on")
 
-        if self.channel2_rBttn.isChecked():
-            print("ch2 is on")
+        if self.channel3_rBttn.isChecked():
+            print("ch3 is on")
+
+        if not self.channel1_rBttn.isChecked():
+            print("ch1 is off")
+
+        if not self.channel2_rBttn.isChecked():
+            print("ch2 is off")
+
+        if not self.channel3_rBttn.isChecked():
+            print("ch3 is off")
+
 
     def browseFiles(self):
         fname = QFileDialog.getOpenFileNames(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
