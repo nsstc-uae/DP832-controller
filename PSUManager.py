@@ -22,15 +22,20 @@ class PSUManager:
 
     def initUI(self):
         pass
-    def initChannels(self,devic):
-        self.channel01.conn(devic)
-        self.channel02.conn(devic)
-        self.channel03.conn(devic)
 
+
+    def initChannels(self,device):
+        #starting connection to device channel
+        self.channel01.conn(device)
+        self.channel02.conn(device)
+        self.channel03.conn(device)
+
+        #reset channels
         self.channel01.reset()
         self.channel03.reset()
         self.channel02.reset()
 
+        #set Bias
         self.channel01.set_bias(channel=1)
         self.channel01.getuserSettings(self.userSettingsCH1)
 
@@ -42,6 +47,7 @@ class PSUManager:
         self.channel03.getuserSettings(self.userSettingsCH3)
 
     def swichChannelOn(self,id):
+        #turn on channels
         if id == 1:
             self.channel01.turn_on(channel=1)
         if id == 2:
@@ -50,19 +56,23 @@ class PSUManager:
             self.channel03.turn_on(channel=3)
 
     def swichChannelOff(self,id):
+        #turn off channels
         if id == 1:
             self.channel01.turn_off(channel=1)
         if id == 2:
             self.channel02.turn_off(channel=2)
         if id == 3:
             self.channel03.turn_off(channel=3)
+
     def savePresets(self):
         pass
     def browseFiles(self):
         pass
     def loadPresets(self):
         pass
+
     def readChannels(self,id):
+        #get values from device
         readCH1= s.Settings
         readCH2 = s.Settings
         readCH3 = s.Settings
@@ -80,6 +90,7 @@ class PSUManager:
         pass
 
     def configureChannel(self,v,c,ovp,ocp,id):
+        #send user configurations to device
         if id == 1:
             self.userSettingsCH1.setAll(v, c, ovp, ocp)
             self.channel01.setuserSettings()
