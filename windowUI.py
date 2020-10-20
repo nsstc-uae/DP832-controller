@@ -2,13 +2,14 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import *
 from multiprocessing import Process
 from main import *
-
+import serial
 import PSUManager as psu
 # import Plot
 import Settings as s
 # import Channel
 # import PlotParameters
-
+import time
+import datetime
 import sys
 import os
 
@@ -59,7 +60,23 @@ class WindowUI(Ui_MainWindow):
         self.setBttn_ch3.clicked.connect(self.setCh3)
         self.switchBttn_channels.clicked.connect(self.switchChannels)
         #Process(target=self.readingOutput().start())
-        self.readingOutput()
+        # fpw=open("/dev/usbtmc0", "w")
+        # #fpw.write(":OUTP CH1,ON")
+        # fpw.write(":MEAS:VOLT? CH1")
+        # time.sleep(1)
+        # fp=open("/dev/usbtmc0", "r")
+        # i=0;
+        #
+        # while(i<10):
+        #     i=i+1
+        #     try:
+        #         val=fp.read(2)
+        #         print("\nthe voltage is 1111111 : " +val)
+        #     except:
+        #         print("\nfailed111")
+        #self.readingOutput()
+
+
 
     def readingOutput(self):
 
@@ -162,7 +179,8 @@ class WindowUI(Ui_MainWindow):
         # self.loadF(chID=chID, chVol=chVol, chCurr=chCurr, chOVP=chOVP, chOCP=chOCP)
 
     def writeFile(self):
-        fn = "preset2.txt"
+        dt =str(datetime.datetime.now())
+        fn = "preset"+dt+".txt"
         ### getting channel settings
         chVol_1 = str(self.voltageSP_ch1.value())
         chCurr_1 = str(self.currentSP_ch1.value())
