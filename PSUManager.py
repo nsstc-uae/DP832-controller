@@ -64,24 +64,18 @@ class PSUManager:
         if id == 3:
             self.channel03.turn_off(channel=3)
 
-    def savePresets(self):
-        pass
-    def browseFiles(self):
-        pass
-    def loadPresets(self):
-        pass
+    # def savePresets(self):
+    #     pass
+    # def browseFiles(self):
+    #     pass
+    # def loadPresets(self):
+    #     pass
 
-    def readChannels(self,id):
+    def readChannels(self):
         #get values from device
-        readCH1= s.Settings
-        readCH2 = s.Settings
-        readCH3 = s.Settings
-        if id == 1:
-           readCH1= self.channel01.getreadingsSettings()
-        if id == 2:
-            readCH2 = self.channel02.getreadingsSettings()
-        if id == 3:
-            readCH3 = self.channel03.getreadingsSettings()
+        readCH1= self.channel01.getreadingsSettings()
+        readCH2 = self.channel02.getreadingsSettings()
+        readCH3 = self.channel03.getreadingsSettings()
 
         readings = [readCH1, readCH2, readCH3]
 
