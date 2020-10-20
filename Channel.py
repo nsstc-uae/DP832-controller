@@ -3,6 +3,8 @@ import Settings as s
 import datetime
 import time, sys
 from multiprocessing import Process
+import os
+
 class Channel:
     id =1
     userSettings = s.Settings()
@@ -33,6 +35,8 @@ class Channel:
     def myread(self):
         time.sleep(0.01)
         result = self.fpread.read()
+        #result = os.read(self.fpread.fileno(),50)
+
         return result
 
     """resets the insterument"""
@@ -56,14 +60,15 @@ class Channel:
         self.mywrite(':VOLT:PROT {v_level}'.format(v_level=v_protection_level))
         self.mywrite(':VOLT:PROT:STAT ON')
 
-    def turn_off(self, channel=1):
+    def turn_off(self, channel):
         self.mywrite(':OUTP CH{channel},OFF'.format(channel=channel))
         self.mywrite(':VOLT:PROT:STAT OFF')
         self.mywrite(':CURR:PROT:STAT OFF')
 
-    def turn_on(self, channel=1):
+    def turn_on(self, channel):
         self.mywrite(':OUTP CH{channel},ON'.format(channel=channel))
 
+        #user settings
     def uservoltage(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':VOLT {0}'.format(self.userSettings.getVolt()))
@@ -74,7 +79,7 @@ class Channel:
 
     def userOVP(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':VOLT:PROT {ovp}'.format(self.userSettings.getOVP()))
+        self.mywrite(':VOLT:PROT {ovp}'.format(ovp=self.userSettings.getOVP()))
         self.mywrite(':VOLT:PROT:STAT ON')
 
     def userOCP(self):
@@ -82,36 +87,47 @@ class Channel:
         self.mywrite(':CURR:PROT {ocp}'.format(ocp=self.userSettings.getOCP()))
         self.mywrite(':CURR:PROT:STAT ON')
 
+
     def ocpOFF(self):
         self.mywrite(':CURR:PROT:STAT OFF')
+
+    def ocpON(self):
+        self.mywrite(':CURR:PROT:STAT ON')
 
     def ovpOFF(self):
         self.mywrite(':VOLT:PROT:STAT OFF')
 
+    def ovpON(self):
+        self.mywrite(':VOLT:PROT:STAT ON')
 
+        #reading output
     def readVolt(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
-        print(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
         volt = self.myread()
+        print(volt)
         self.readingsSettings.setVolt(volt)
 
     def readCurrent(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':MEAS:CURR? CH{channel}'.format(channel=int(self.id)))
         current = self.myread()
+        print(current)
         self.readingsSettings.setCurr(current)
 
     def readovp(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':MEAS:VOLT:PROT:? CH{channel}'.format(channel=int(self.id)))
+        time.sleep(5)
         ovp = self.myread()
+        print(ovp)
         self.readingsSettings.setOVP(ovp)
 
     def readocp(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':MEAS:CURR:PROT:? CH{channel}'.format(channel=int(self.id)))
         ocp = self.myread()
+        print(ocp)
         self.readingsSettings.setOCP(ocp)
 
     def getuserSettings(self,settings):
@@ -142,6 +158,13 @@ class Channel:
     #     Process(target=self.writeFilePlot().start())  # start now
     #     myplot = p.Plot(self.id)#start at the same time
     #     myplot.Plot.startPlot()#start after plot
-
-
-
+# if __name__ == '__main__':
+#     test = Channel()
+#     # Insert your serial number here / confirm via Ultra Sigma GUI
+#     test.conn("/dev/usbtmc0")
+#     test.reset()
+#     test.turn_on(channel=1)
+#     test.set_bias(1)
+#     test.ocpON()
+#     test.ovpON()
+#     test.getreadingsSettings()
