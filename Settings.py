@@ -4,6 +4,7 @@ class Settings:
     ovp = 0.0
     ocp= 0.0
     state= False
+
     def _init_(self, voltage, current, ovp, ocp, state):
         self.voltage=voltage
         self.current=current
@@ -27,7 +28,7 @@ class Settings:
         self.ovp=ovp
     def setOCP(self,ocp):
         self.ocp=ocp
-    def setALL(self,v,c,ovp,ocp):
+    def setAll(self,v,c,ovp,ocp):
         self.ocp = ocp
         self.ovp = ovp
         self.current = c
