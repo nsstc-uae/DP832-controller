@@ -34,7 +34,7 @@ class Channel:
     """read from instrument"""
     def myread(self):
         time.sleep(0.01)
-        result = self.fpread.read()
+        result = self.fpread.read(5)
         #result = os.read(self.fpread.fileno(),50)
 
         return result
@@ -105,29 +105,29 @@ class Channel:
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
         volt = self.myread()
-        print(volt)
+        #print(volt)
         self.readingsSettings.setVolt(volt)
 
     def readCurrent(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':MEAS:CURR? CH{channel}'.format(channel=int(self.id)))
         current = self.myread()
-        print(current)
+        #print(current)
         self.readingsSettings.setCurr(current)
 
     def readovp(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':MEAS:VOLT:PROT:? CH{channel}'.format(channel=int(self.id)))
+        self.mywrite(':OUTP:OVP:VAL? CH{channel}'.format(channel=int(self.id)))
         time.sleep(5)
         ovp = self.myread()
-        print(ovp)
+        #print(ovp)
         self.readingsSettings.setOVP(ovp)
 
     def readocp(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':MEAS:CURR:PROT:? CH{channel}'.format(channel=int(self.id)))
+        self.mywrite(':OUTP:OCP:VAL? CH{channel}'.format(channel=int(self.id)))
         ocp = self.myread()
-        print(ocp)
+        #print(ocp)
         self.readingsSettings.setOCP(ocp)
 
     def getuserSettings(self,settings):
