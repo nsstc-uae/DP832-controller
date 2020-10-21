@@ -46,7 +46,7 @@ class PSUManager:
         self.channel03.set_bias(channel=3)
         self.channel03.getuserSettings(self.userSettingsCH3)
 
-    def swichChannelOn(self,id):
+    def switchChannelOn(self,id):
         #turn on channels
         if id == 1:
             self.channel01.turn_on(channel=1)
@@ -55,7 +55,7 @@ class PSUManager:
         if id == 3:
             self.channel03.turn_on(channel=3)
 
-    def swichChannelOff(self,id):
+    def switchChannelOff(self,id):
         #turn off channels
         if id == 1:
             self.channel01.turn_off(channel=1)
