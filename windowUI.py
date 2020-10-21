@@ -103,27 +103,27 @@ class WindowUI(Ui_MainWindow):
 
     def switchChannels(self):
         if self.channel1_rBttn.isChecked():
-            self.psu.swichChannelOn(id=1)
+            self.psu.switchChannelOn(id=1)
             print("ch1 is on")
 
         if self.channel2_rBttn.isChecked():
-            self.psu.swichChannelOn(id=2)
+            self.psu.switchChannelOn(id=2)
             print("ch2 is on")
 
         if self.channel3_rBttn.isChecked():
-            self.psu.swichChannelOn(id=3)
+            self.psu.switchChannelOn(id=3)
             print("ch3 is on")
 
         if not self.channel1_rBttn.isChecked():
-            self.psu.swichChannelOff(id=1)
+            self.psu.switchChannelOff(id=1)
             print("ch1 is off")
 
         if not self.channel2_rBttn.isChecked():
-            self.psu.swichChannelOff(id=2)
+            self.psu.switchChannelOff(id=2)
             print("ch2 is off")
 
         if not self.channel3_rBttn.isChecked():
-            self.psu.swichChannelOff(id=3)
+            self.psu.switchChannelOff(id=3)
             print("ch3 is off")
 
     def browseFiles(self):
