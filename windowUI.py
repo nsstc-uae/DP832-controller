@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import *
+from threading import Thread
 from multiprocessing import Process
 from main import *
 import serial
@@ -59,7 +60,6 @@ class WindowUI(Ui_MainWindow):
         self.setBttn_ch2.clicked.connect(self.setCh2)
         self.setBttn_ch3.clicked.connect(self.setCh3)
         self.switchBttn_channels.clicked.connect(self.switchChannels)
-        #Process(target=self.readingOutput().start())
         # fpw=open("/dev/usbtmc0", "w")
         # #fpw.write(":OUTP CH1,ON")
         # fpw.write(":MEAS:VOLT? CH1")
@@ -80,23 +80,26 @@ class WindowUI(Ui_MainWindow):
 
     def readingOutput(self):
 
-        readings = self.psu.readChannels()
-        self.voltageReadingField_ch1.setText(str(readings[0].getVolt()))
-        self.currentReadingField_ch1.setText(str(readings[0].getCurr()))
-        self.ocpCurrTF_ch1.setText(str(readings[0].getOCP()))
-        self.ovpVolTF_ch1.setText(str(readings[0].getOVP()))
+        while True :
+            readings = self.psu.readChannels()
+            self.voltageReadingField_ch1.setText(str(readings[0].getVolt()))
+            self.currentReadingField_ch1.setText(str(readings[0].getCurr()))
+            self.ocpCurrTF_ch1.setText(str(readings[0].getOCP()))
+            self.ovpVolTF_ch1.setText(str(readings[0].getOVP()))
 
-        self.voltageReadingField_ch2.setText(str(readings[1].getVolt()))
-        self.currentReadingField_ch2.setText(str(readings[1].getCurr()))
-        self.ocpCurrTF_ch2.setText(str(readings[1].getOCP()))
-        self.ovpVolTF_ch2.setText(str(readings[1].getOVP()))
+            self.voltageReadingField_ch2.setText(str(readings[1].getVolt()))
+            self.currentReadingField_ch2.setText(str(readings[1].getCurr()))
+            self.ocpCurrTF_ch2.setText(str(readings[1].getOCP()))
+            self.ovpVolTF_ch2.setText(str(readings[1].getOVP()))
 
-        print(readings)
 
-        self.voltageReadingField_ch3.setText(str(readings[2].getVolt()))
-        self.currentReadingField_ch3.setText(str(readings[2].getCurr()))
-        self.ocpCurrTF_ch3.setText(str(readings[2].getOCP()))
-        self.ovpVolTF_ch3.setText(str(readings[2].getOVP()))
+
+            self.voltageReadingField_ch3.setText(str(readings[2].getVolt()))
+            self.currentReadingField_ch3.setText(str(readings[2].getCurr()))
+            self.ocpCurrTF_ch3.setText(str(readings[2].getOCP()))
+            self.ovpVolTF_ch3.setText(str(readings[2].getOVP()))
+
+            time.sleep(5)
 
     def switchChannels(self):
         if self.channel1_rBttn.isChecked():
@@ -248,6 +251,14 @@ app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
 
 ui = WindowUI(MainWindow)
-
 MainWindow.show()
-app.exec_()
+Thread(target = app.exec_()).start()
+Thread(target = ui.readingOutput()).start()
+
+
+
+# timer = QTimer(MainWindow)
+# timer.timeout.connect(ui.readingOutput())
+# timer.start(1000)
+
+
