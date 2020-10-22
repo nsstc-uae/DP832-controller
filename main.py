@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -110,6 +111,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.channel3_rBttn, 2, 12, 1, 1)
         self.uploadfileTF = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.uploadfileTF.setObjectName("uploadfileTF")
+        self.uploadfileTF.setReadOnly(True)
         self.gridLayout_2.addWidget(self.uploadfileTF, 2, 2, 1, 1)
         self.ocpCurrSP_ch2 = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.ocpCurrSP_ch2.setObjectName("ocpCurrSP_ch2")
@@ -133,6 +135,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ocpCurrLabelS_ch3, 16, 20, 1, 1)
         self.ocpStateTF_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ocpStateTF_ch3.setObjectName("ocpStateTF_ch3")
+        self.ocpStateTF_ch3.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ocpStateTF_ch3, 15, 18, 1, 1)
         self.ocpStateBttn_ch3 = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
         self.ocpStateBttn_ch3.setObjectName("ocpStateBttn_ch3")
@@ -144,6 +148,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addItem(spacerItem, 9, 2, 1, 1)
         self.ocpCurrTF_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ocpCurrTF_ch3.setObjectName("ocpCurrTF_ch3")
+        self.ocpCurrTF_ch3.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ocpCurrTF_ch3, 16, 18, 1, 1)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_2.addItem(spacerItem1, 11, 7, 1, 1)
@@ -166,12 +172,15 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ovpStateLabelS_ch3, 11, 20, 1, 1)
         self.voltageReadingField_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.voltageReadingField_ch1.setObjectName("voltageReadingField_ch1")
+        self.voltageReadingField_ch1.setReadOnly(True)
         self.gridLayout_2.addWidget(self.voltageReadingField_ch1, 7, 3, 1, 1)
         self.ovpVolSP_ch3 = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.ovpVolSP_ch3.setObjectName("ovpVolSP_ch3")
         self.gridLayout_2.addWidget(self.ovpVolSP_ch3, 12, 21, 1, 1)
         self.ovpVolTF_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ovpVolTF_ch3.setObjectName("ovpVolTF_ch3")
+        self.ovpVolTF_ch3.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ovpVolTF_ch3, 12, 18, 1, 1)
         self.label_5 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         font = QtGui.QFont()
@@ -182,6 +191,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.label_5, 14, 2, 1, 1)
         self.ocpStateTF_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ocpStateTF_ch1.setObjectName("ocpStateTF_ch1")
+        self.ocpStateTF_ch1.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ocpStateTF_ch1, 15, 3, 1, 1)
         self.setStateBttn_ch3 = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
         self.setStateBttn_ch3.setObjectName("setStateBttn_ch3")
@@ -191,6 +202,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ovpStateBttn_ch1, 11, 6, 1, 1)
         self.currentReadingField_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.currentReadingField_ch3.setObjectName("currentReadingField_ch3")
+        self.currentReadingField_ch3.setReadOnly(True)
         self.gridLayout_2.addWidget(self.currentReadingField_ch3, 8, 18, 1, 1)
         self.voltageSP_ch3 = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.voltageSP_ch3.setObjectName("voltageSP_ch3")
@@ -206,6 +218,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ocpStateLabelS_ch2, 15, 12, 1, 1)
         self.ocpCurrTF_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ocpCurrTF_ch1.setObjectName("ocpCurrTF_ch1")
+        self.ocpCurrTF_ch1.setReadOnly(True)
         self.gridLayout_2.addWidget(self.ocpCurrTF_ch1, 16, 3, 1, 1)
         self.ocpStateLabelS_ch1 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.ocpStateLabelS_ch1.setObjectName("ocpStateLabelS_ch1")
@@ -215,6 +228,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ocpStateLabelR_ch2, 15, 9, 1, 1)
         self.ocpStateTF_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ocpStateTF_ch2.setObjectName("ocpStateTF_ch2")
+        self.ocpStateTF_ch2.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ocpStateTF_ch2, 15, 10, 1, 1)
         self.ocpCurrLabelS_ch1 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.ocpCurrLabelS_ch1.setObjectName("ocpCurrLabelS_ch1")
@@ -227,6 +242,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ocpCurrLabelS_ch2, 16, 12, 1, 1)
         self.ovpVolTF_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ovpVolTF_ch1.setObjectName("ovpVolTF_ch1")
+        self.ovpVolTF_ch1.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ovpVolTF_ch1, 12, 3, 1, 1)
         self.ovpStateLabelR_ch2 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.ovpStateLabelR_ch2.setObjectName("ovpStateLabelR_ch2")
@@ -236,6 +253,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ovpStateLabelR_ch1, 11, 2, 1, 1)
         self.ocpCurrTF_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ocpCurrTF_ch2.setObjectName("ocpCurrTF_ch2")
+        self.ocpCurrTF_ch2.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ocpCurrTF_ch2, 16, 10, 1, 1)
         self.ocpStateBttn_ch2 = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
         self.ocpStateBttn_ch2.setObjectName("ocpStateBttn_ch2")
@@ -248,6 +267,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ovpVolLabelR_ch1, 12, 2, 1, 1)
         self.ovpVolTF_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ovpVolTF_ch2.setObjectName("ovpVolTF_ch2")
+        self.ovpVolTF_ch2.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ovpVolTF_ch2, 12, 10, 1, 1)
         self.ovpVolSP_ch1 = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.ovpVolSP_ch1.setObjectName("ovpVolSP_ch1")
@@ -263,6 +284,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ovpVolLabelS_ch1, 12, 5, 1, 1)
         self.ovpStateTF_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ovpStateTF_ch2.setObjectName("ovpStateTF_ch2")
+        self.ovpStateTF_ch2.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ovpStateTF_ch2, 11, 10, 1, 1)
         self.voltageLabelR_ch1 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.voltageLabelR_ch1.setObjectName("voltageLabelR_ch1")
@@ -278,12 +301,15 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.stateLabelR_ch1, 6, 2, 1, 1)
         self.statetReadingField_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.statetReadingField_ch1.setObjectName("statetReadingField_ch1")
+        self.statetReadingField_ch1.setReadOnly(True)
         self.gridLayout_2.addWidget(self.statetReadingField_ch1, 6, 3, 1, 1)
         self.voltageLabelS_ch1 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.voltageLabelS_ch1.setObjectName("voltageLabelS_ch1")
         self.gridLayout_2.addWidget(self.voltageLabelS_ch1, 7, 5, 1, 1)
         self.ovpStateTF_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ovpStateTF_ch3.setObjectName("ovpStateTF_ch3")
+        self.ovpStateTF_ch3.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ovpStateTF_ch3, 11, 18, 1, 1)
         self.currentLabelS_ch1 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.currentLabelS_ch1.setObjectName("currentLabelS_ch1")
@@ -314,12 +340,15 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.voltageSP_ch1, 7, 6, 1, 1)
         self.currentReadingField_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.currentReadingField_ch1.setObjectName("currentReadingField_ch1")
+        self.currentReadingField_ch1.setReadOnly(True)
         self.gridLayout_2.addWidget(self.currentReadingField_ch1, 8, 3, 1, 1)
         self.voltageLabelR_ch2 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.voltageLabelR_ch2.setObjectName("voltageLabelR_ch2")
         self.gridLayout_2.addWidget(self.voltageLabelR_ch2, 7, 9, 1, 1)
         self.currentReadingField_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.currentReadingField_ch2.setObjectName("currentReadingField_ch2")
+        self.currentReadingField_ch2.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.currentReadingField_ch2, 8, 10, 1, 1)
         self.stateLabelR_ch2 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.stateLabelR_ch2.setObjectName("stateLabelR_ch2")
@@ -329,9 +358,12 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.currentLabelR_ch1, 8, 2, 1, 1)
         self.voltageReadingField_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.voltageReadingField_ch2.setObjectName("voltageReadingField_ch2")
+        self.voltageReadingField_ch2.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.voltageReadingField_ch2, 7, 10, 1, 1)
         self.statetReadingField_ch2 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.statetReadingField_ch2.setObjectName("statetReadingField_ch2")
+        self.statetReadingField_ch2.setReadOnly(True)
         self.gridLayout_2.addWidget(self.statetReadingField_ch2, 6, 10, 1, 1)
         self.currentLabelS_ch2 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.currentLabelS_ch2.setObjectName("currentLabelS_ch2")
@@ -344,9 +376,11 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.voltageSP_ch2, 7, 14, 1, 1)
         self.statetReadingField_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.statetReadingField_ch3.setObjectName("statetReadingField_ch3")
+        self.statetReadingField_ch3.setReadOnly(True)
         self.gridLayout_2.addWidget(self.statetReadingField_ch3, 6, 18, 1, 1)
         self.voltageReadingField_ch3 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.voltageReadingField_ch3.setObjectName("voltageReadingField_ch3")
+        self.voltageReadingField_ch3.setReadOnly(True)
         self.gridLayout_2.addWidget(self.voltageReadingField_ch3, 7, 18, 1, 1)
         self.currentSP_ch2 = QtWidgets.QDoubleSpinBox(self.scrollAreaWidgetContents)
         self.currentSP_ch2.setObjectName("currentSP_ch2")
@@ -393,6 +427,8 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addItem(spacerItem3, 11, 15, 1, 1)
         self.ovpStateTF_ch1 = QtWidgets.QLineEdit(self.scrollAreaWidgetContents)
         self.ovpStateTF_ch1.setObjectName("ovpStateTF_ch1")
+        self.ovpStateTF_ch1.setReadOnly(True)
+
         self.gridLayout_2.addWidget(self.ovpStateTF_ch1, 11, 3, 1, 1)
         self.label_2 = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         font = QtGui.QFont()
