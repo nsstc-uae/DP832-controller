@@ -168,9 +168,9 @@ class WindowUI(Ui_MainWindow):
                 'Channel ID: ' + chID + ', Voltage: ' + chVol + ', Current: ' + chCurr + ', OVP: ' + chOVP + ', OCP: ' + chOCP)
         # self.loadF(chID=chID, chVol=chVol, chCurr=chCurr, chOVP=chOVP, chOCP=chOCP)
 
-    def writeFile(self):
-        dt = str(datetime.datetime.now())
-        fn = "preset" + dt + ".txt"
+    def writeFile(self, fn):
+       # dt = str(datetime.datetime.now())
+      #  fn = "preset" + dt + ".txt"
         ### getting channel settings
         chVol_1 = str(self.voltageSP_ch1.value())
         chCurr_1 = str(self.currentSP_ch1.value())
@@ -196,8 +196,14 @@ class WindowUI(Ui_MainWindow):
         f.write("3, " + chVol_3 + ", " + chCurr_3 + ", " + chOVP_3 + ", " + chOCP_3)
         f.close()
 
+#     def saveAs(self):
+#         self.writeFile()
+#         print("Save as preset")
+
     def saveAs(self):
-        self.writeFile()
+        name = QtGui.QFileDialog.getSaveFileName(self, 'Save File')
+        file = open(name, 'w')
+        self.writeFile(file)
         print("Save as preset")
 
     def applySelected(self):
