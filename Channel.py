@@ -1,170 +1,350 @@
-# import Plot as p
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtCore import *
+# import threading
+# from multiprocessing import Process
+from main import *
+# import serial
+import PSUManager as psu
+# import Plot
 import Settings as s
+# import Channel
+# import PlotParameters
+import time
 import datetime
-import time, sys
-from multiprocessing import Process
+import sys
 import os
+import threading
+reading = True
+lock = threading.Lock()
 
-class Channel:
-    id =1
-    userSettings = s.Settings()
-    #lastAppliedSettings = s.Settings()
-    readingsSettings = s.Settings()
-    fpwrite=None
-    fpread=None
+class WindowUI(Ui_MainWindow):
+    psu = psu.PSUManager()
 
-    def _init_(self, id, userSettings):
-        self.id=id
-        self.userSettings=userSettings
+    def __init__(self, window):
+        #lock.acquire()
+        self.setupUi(window)
 
-    def setID(self,ID):
-        self.id=ID
+        ##PSUManager
+        self.psu.initChannels(device="/dev/usbtmc0")
+        ##SpinBox Configure
+        self.voltageSP_ch1.setMaximum(30)
+        self.voltageSP_ch2.setMaximum(30)
+        self.voltageSP_ch3.setMaximum(5)
 
-    """Attempt to connect to instrument via files"""
-    def conn(self,device):
+        self.currentSP_ch1.setMaximum(3)
+        self.currentSP_ch2.setMaximum(3)
+        self.currentSP_ch3.setMaximum(3)
 
-        self.fpwrite = open(device,"w")
-        self.fpread = open(device, "r")
+        self.ovpVolSP_ch1.setMinimum(0.01)
+        self.ovpVolSP_ch2.setMinimum(0.01)
+        self.ovpVolSP_ch3.setMinimum(0.01)
 
-    """write into instrument"""
-    def mywrite(self, message):
-        self.fpwrite.write(message)
-        self.fpwrite.flush()
-        time.sleep(0.1)
-    """read from instrument"""
-    def myread(self):
-        time.sleep(0.01)
-        result = self.fpread.read(5)
-        #result = os.read(self.fpread.fileno(),50)
+        self.ovpVolSP_ch1.setMaximum(33)
+        self.ovpVolSP_ch2.setMaximum(33)
+        self.ovpVolSP_ch3.setMaximum(5.5)
 
-        return result
+        self.ocpCurrSP_ch1.setMinimum(0.001)
+        self.ocpCurrSP_ch2.setMinimum(0.001)
+        self.ocpCurrSP_ch3.setMinimum(0.001)
 
-    """resets the insterument"""
-    def reset(self):
-        self.mywrite("*RST")
-        time.sleep(0.2)
+        self.ocpCurrSP_ch1.setDecimals(3)
+        self.ocpCurrSP_ch2.setDecimals(3)
+        self.ocpCurrSP_ch3.setDecimals(3)
 
-    def close_instrument(self):
-        self.fpwrite.close()
+        self.ocpCurrSP_ch1.setMaximum(3.3)
+        self.ocpCurrSP_ch2.setMaximum(3.3)
+        self.ocpCurrSP_ch3.setMaximum(3.3)
 
-    def set_bias(self, channel):
-        i = 0.1
-        i_protection_level = 0.1
-        v_protection_level = 0.9
-        v = 0.5
-        self.mywrite(':INST CH{channel}'.format(channel=int(channel)))
-        self.mywrite(':CURR {i}'.format(i=i))
-        self.mywrite(':CURR:PROT {i_level}'.format(i_level=i_protection_level))
-        self.mywrite(':CURR:PROT:STAT ON')
-        self.mywrite(':VOLT {0}'.format(v))
-        self.mywrite(':VOLT:PROT {v_level}'.format(v_level=v_protection_level))
-        self.mywrite(':VOLT:PROT:STAT ON')
+        ##Buttons
+        self.browseBttn.clicked.connect(self.browseFiles)
+        self.saveAsBttn.clicked.connect(self.saveAs)
+        self.setBttn_ch1.clicked.connect(self.setCh1)
+        self.setBttn_ch2.clicked.connect(self.setCh2)
+        self.setBttn_ch3.clicked.connect(self.setCh3)
+        self.switchBttn_channels.clicked.connect(self.switchChannels)
 
-    def turn_off(self, channel):
-        self.mywrite(':OUTP CH{channel},OFF'.format(channel=channel))
-        self.mywrite(':VOLT:PROT:STAT OFF')
-        self.mywrite(':CURR:PROT:STAT OFF')
+        self.ovpStateBttn_ch1.setChecked(True)
+        self.ovpStateBttn_ch2.setChecked(True)
+        self.ovpStateBttn_ch3.setChecked(True)
+        self.ocpStateBttn_ch1.setChecked(True)
+        self.ocpStateBttn_ch2.setChecked(True)
+        self.ocpStateBttn_ch3.setChecked(True)
 
-    def turn_on(self, channel):
-        self.mywrite(':OUTP CH{channel},ON'.format(channel=channel))
+        self.worker = ThreadClass()
+        self.workerThread = QtCore.QThread()
+        self.workerThread.started.connect(self.worker.run)
+        self.worker.signalExample.connect(self.readingOutput)
+        self.worker.moveToThread(self.workerThread)
+        self.workerThread.start()
 
-        #user settings
-    def uservoltage(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':VOLT {0}'.format(self.userSettings.getVolt()))
+    def readingOutput(self, readings):
+        self.voltageReadingField_ch1.setText(str(readings[0].getVolt()))
+        self.currentReadingField_ch1.setText(str(readings[0].getCurr()))
+        self.ocpCurrTF_ch1.setText(str(readings[0].getOCP()))
+        self.ovpVolTF_ch1.setText(str(readings[0].getOVP()))
+        self.statetReadingField_ch1.setText(str(readings[0].getChannelState()))
+        self.ovpStateTF_ch1.setText(str(readings[0].getOvpS()))
+        self.ocpStateTF_ch1.setText(str(readings[0].getOcpS()))
 
-    def usercurrent(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':CURR {c}'.format(c=self.userSettings.getCurr()))
+        self.voltageReadingField_ch2.setText(str(readings[1].getVolt()))
+        self.currentReadingField_ch2.setText(str(readings[1].getCurr()))
+        self.ocpCurrTF_ch2.setText(str(readings[1].getOCP()))
+        self.ovpVolTF_ch2.setText(str(readings[1].getOVP()))
+        self.statetReadingField_ch2.setText(str(readings[1].getChannelState()))
+        self.ovpStateTF_ch2.setText(str(readings[1].getOvpS()))
+        self.ocpStateTF_ch2.setText(str(readings[1].getOcpS()))
 
-    def userOVP(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':VOLT:PROT {ovp}'.format(ovp=self.userSettings.getOVP()))
-        self.mywrite(':VOLT:PROT:STAT ON')
+        self.voltageReadingField_ch3.setText(str(readings[2].getVolt()))
+        self.currentReadingField_ch3.setText(str(readings[2].getCurr()))
+        self.ocpCurrTF_ch3.setText(str(readings[2].getOCP()))
+        self.ovpVolTF_ch3.setText(str(readings[2].getOVP()))
+        self.statetReadingField_ch3.setText(str(readings[2].getChannelState()))
+        self.ovpStateTF_ch3.setText(str(readings[2].getOvpS()))
+        self.ocpStateTF_ch3.setText(str(readings[2].getOcpS()))
 
-    def userOCP(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':CURR:PROT {ocp}'.format(ocp=self.userSettings.getOCP()))
-        self.mywrite(':CURR:PROT:STAT ON')
+    def switchChannels(self):
+        #global reading
+       # if (reading == False):
+
+        global lock
+        lock.acquire()
+
+        if self.channel1_rBttn.isChecked():
+            self.setStateBttn_ch1.setChecked(True)
+            self.psu.switchChannelOn(id=1)
+            print("ch1 is on")
+
+        if self.channel2_rBttn.isChecked():
+            self.setStateBttn_ch2.setChecked(True)
+            self.psu.switchChannelOn(id=2)
+            print("ch2 is on")
+
+        if self.channel3_rBttn.isChecked():
+            self.setStateBttn_ch3.setChecked(True)
+            self.psu.switchChannelOn(id=3)
+            print("ch3 is on")
+
+        if not self.channel1_rBttn.isChecked():
+            self.psu.switchChannelOff(id=1)
+            print("ch1 is off")
+
+        if not self.channel2_rBttn.isChecked():
+            self.psu.switchChannelOff(id=2)
+            print("ch2 is off")
+
+        if not self.channel3_rBttn.isChecked():
+            self.psu.switchChannelOff(id=3)
+            print("ch3 is off")
 
 
-    def ocpOFF(self):
-        self.mywrite(':CURR:PROT:STAT OFF')
 
-    def ocpON(self):
-        self.mywrite(':CURR:PROT:STAT ON')
+        #else:print("wait Reading")
 
-    def ovpOFF(self):
-        self.mywrite(':VOLT:PROT:STAT OFF')
+    def browseFiles(self):
+        fname = QFileDialog.getOpenFileNames(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
+        fpath = fname[0][0]
+        print(fpath)
+        self.uploadfileTF.setText(fpath)
+        self.readF(fpath)
+        print("browse file button")
 
-    def ovpON(self):
-        self.mywrite(':VOLT:PROT:STAT ON')
+    def readF(self, fn):
+        if fn:
+            f = open(fn, 'r')
+        with f:
+            data = f.read()
+            self.readData(data)
 
-        #reading output
-    def readVolt(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
-        volt = self.myread()
-        #print(volt)
-        self.readingsSettings.setVolt(volt)
+    # method to read file after opening.
+    def readData(self, dt):
+        dd = dt.splitlines()
+        for line in dd:
+            contents = line.split(',')
+            chID = contents[0]
+            chVol = contents[1]
+            chCurr = contents[2]
+            chOVP = contents[3]
+            chOCP = contents[4]
+            if chID == "1":
+                self.setStateBttn_ch1.setChecked(True)
+                self.voltageSP_ch1.setValue(float(chVol))
+                self.currentSP_ch1.setValue(float(chCurr))
+                self.ovpStateBttn_ch1.setChecked(True)
+                self.ovpVolSP_ch1.setValue(float(chOVP))
+                self.ocpStateBttn_ch1.setChecked(True)
+                self.ocpCurrSP_ch1.setValue(float(chOCP))
 
-    def readCurrent(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':MEAS:CURR? CH{channel}'.format(channel=int(self.id)))
-        current = self.myread()
-        #print(current)
-        self.readingsSettings.setCurr(current)
+            if chID == "2":
+                self.setStateBttn_ch2.setChecked(True)
+                self.voltageSP_ch2.setValue(float(chVol))
+                self.currentSP_ch2.setValue(float(chCurr))
+                self.ovpStateBttn_ch2.setChecked(True)
+                self.ovpVolSP_ch2.setValue(float(chOVP))
+                self.ocpStateBttn_ch2.setChecked(True)
+                self.ocpCurrSP_ch2.setValue(float(chOCP))
 
-    def readovp(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':OUTP:OVP:VAL? CH{channel}'.format(channel=int(self.id)))
-        time.sleep(5)
-        ovp = self.myread()
-        #print(ovp)
-        self.readingsSettings.setOVP(ovp)
+            if chID == "3":
+                self.setStateBttn_ch3.setChecked(True)
+                self.voltageSP_ch3.setValue(float(chVol))
+                self.currentSP_ch3.setValue(float(chCurr))
+                self.ovpStateBttn_ch3.setChecked(True)
+                self.ovpVolSP_ch3.setValue(float(chOVP))
+                self.ocpStateBttn_ch3.setChecked(True)
+                self.ocpCurrSP_ch3.setValue(float(chOCP))
 
-    def readocp(self):
-        self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
-        self.mywrite(':OUTP:OCP:VAL? CH{channel}'.format(channel=int(self.id)))
-        ocp = self.myread()
-        #print(ocp)
-        self.readingsSettings.setOCP(ocp)
+            print(
+                'Channel ID: ' + chID + ', Voltage: ' + chVol + ', Current: ' + chCurr + ', OVP: ' + chOVP + ', OCP: ' + chOCP)
+        # self.loadF(chID=chID, chVol=chVol, chCurr=chCurr, chOVP=chOVP, chOCP=chOCP)
 
-    def getuserSettings(self,settings):
-        self.userSettings = settings
-    def setuserSettings(self):
-        self.uservoltage()
-        self.usercurrent()
-        self.userOCP()
-        self.userOVP()
+    def writeFile(self,fn):
+        #dt = str(datetime.datetime.now())
+        #fn = "preset" + dt + ".txt"
+        ### getting channel settings
+        chVol_1 = str(self.voltageSP_ch1.value())
+        chCurr_1 = str(self.currentSP_ch1.value())
+        chOVP_1 = str(self.ovpVolSP_ch1.value())
+        chOCP_1 = str(self.ocpCurrSP_ch1.value())
 
-    def getreadingsSettings(self):
-        self.readCurrent()
-        self.readocp()
-        self.readVolt()
-        self.readovp()
-        return self.readingsSettings
+        chVol_2 = str(self.voltageSP_ch2.value())
+        chCurr_2 = str(self.currentSP_ch2.value())
+        chOVP_2 = str(self.ovpVolSP_ch2.value())
+        chOCP_2 = str(self.ocpCurrSP_ch2.value())
 
-    def writeFilePlot(self):
-        state = True
-        while state:
-            fn = "Channel"+self.id+".txt"
-            f = open(fn, "w")
-            f.write(datetime.datetime.now().time()+","+self.readingsSettings.getCurr())
-            time.sleep(5)
+        chVol_3 = str(self.voltageSP_ch3.value())
+        chCurr_3 = str(self.currentSP_ch3.value())
+        chOVP_3 = str(self.ovpVolSP_ch3.value())
+        chOCP_3 = str(self.ocpCurrSP_ch3.value())
+        ###
+
+
+        f = open(fn, 'w')
+        f.write("1, " + chVol_1 + ", " + chCurr_1 + ", " + chOVP_1 + ", " + chOCP_1)
+        f.write("\n")
+        f.write("2, " + chVol_2 + ", " + chCurr_2 + ", " + chOVP_2 + ", " + chOCP_2)
+        f.write("\n")
+        f.write("3, " + chVol_3 + ", " + chCurr_3 + ", " + chOVP_3 + ", " + chOCP_3)
         f.close()
 
-    # def startPlot(self):
-    #     Process(target=self.writeFilePlot().start())  # start now
-    #     myplot = p.Plot(self.id)#start at the same time
-    #     myplot.Plot.startPlot()#start after plot
-# if __name__ == '__main__':
-#     test = Channel()
-#     # Insert your serial number here / confirm via Ultra Sigma GUI
-#     test.conn("/dev/usbtmc0")
-#     test.reset()
-#     test.turn_on(channel=1)
-#     test.set_bias(1)
-#     test.ocpON()
-#     test.ovpON()
-#     test.getreadingsSettings()
+    # def saveAs(self):
+    #     self.writeFile()
+    #     print("Save as preset")
+
+    def saveAs(self):
+        name = QFileDialog.getSaveFileName(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
+        #file = open(name, 'w')
+        #print(name)
+        self.writeFile(name[0]+".txt")
+        print("Save as preset")
+
+    def applySelected(self):
+        print("Apply selected")
+
+    def setCh1(self):
+        #global reading
+        #if (reading == False):
+        global lock
+        lock.acquire()
+        chVol_1 = self.voltageSP_ch1.value()
+        chCurr_1 = self.currentSP_ch1.value()
+        chOVP_1 = self.ovpVolSP_ch1.value()
+        chOCP_1 = self.ocpCurrSP_ch1.value()
+
+        self.psu.switchChannelOn(id=1) if self.setStateBttn_ch1.isChecked() else self.psu.switchChannelOff(id=1)
+
+        self.psu.switchOcpON() if self.ocpStateBttn_ch1.isChecked() else self.psu.switchOcpOFF()
+
+        self.psu.switchOvpON() if self.ovpStateBttn_ch1.isChecked() else self.psu.switchOvpOFF()
+
+        # configureChannel(self,v,c,ovp,ocp,id):
+
+        self.psu.configureChannel(chVol_1, chCurr_1, chOVP_1, chOCP_1, 1)
+        print("channel 1 have been set")
+
+        #else:
+            #print("wait Reading")
+
+    def setCh2(self):
+        #global reading
+        #if (reading == False):
+        global lock
+        lock.acquire()
+        chVol_2 = self.voltageSP_ch2.value()
+        chCurr_2 = self.currentSP_ch2.value()
+        chOVP_2 = self.ovpVolSP_ch2.value()
+        chOCP_2 = self.ocpCurrSP_ch2.value()
+        # configureChannel(self,v,c,ovp,ocp,id):
+        self.psu.switchChannelOn(id=2) if self.setStateBttn_ch2.isChecked() else self.psu.switchChannelOff(id=2)
+
+        self.psu.switchOcpON() if self.ocpStateBttn_ch2.isChecked() else self.psu.switchOcpOFF()
+
+        self.psu.switchOvpON() if self.ovpStateBttn_ch2.isChecked() else self.psu.switchOvpOFF()
+
+        self.psu.configureChannel(chVol_2, chCurr_2, chOVP_2, chOCP_2, 2)
+        print("channel 2 have been set")
+
+        #else:
+            #print("wait Reading")
+
+    def setCh3(self):
+        global lock
+        lock.acquire()
+        #global reading
+        #if (reading == False):
+        chVol_3 = self.voltageSP_ch3.value()
+        chCurr_3 = self.currentSP_ch3.value()
+        chOVP_3 = self.ovpVolSP_ch3.value()
+        chOCP_3 = self.ocpCurrSP_ch3.value()
+        # configureChannel(self,v,c,ovp,ocp,id):
+        self.psu.switchChannelOn(id=3) if self.setStateBttn_ch3.isChecked() else self.psu.switchChannelOff(id=3)
+
+        self.psu.switchOcpON() if self.ocpStateBttn_ch3.isChecked() else self.psu.switchOcpOFF()
+
+        self.psu.switchOvpON() if self.ovpStateBttn_ch3.isChecked() else self.psu.switchOvpOFF()
+
+        self.psu.configureChannel(chVol_3, chCurr_3, chOVP_3, chOCP_3, 3)
+        print("channel 3 have been set")
+
+        #else:
+           # print("wait Reading")
+
+
+class ThreadClass(QtCore.QThread):
+    signalExample = QtCore.pyqtSignal(object)
+    psu = psu.PSUManager()
+    global lock
+
+    def __init__(self):
+        super().__init__()
+        self.psu.connect(device="/dev/usbtmc0")
+
+
+    @QtCore.pyqtSlot()
+    def run(self):
+        global lock
+
+        while 1:
+            try:
+                lock.release()
+            #print("Reading now")
+                result = self.psu.readChannels()
+                self.signalExample.emit(result)
+                time.sleep(5)
+            except:
+                lock.acquire()
+            #lock.release()
+            #reading = False
+            #print("ovp:"+result[0].getOVP()+"\n ocp:"+ result[0].getOCP()+"\n curr:"+result[0].getCurr()+"\n vol:"+result[0].getVolt() )
+            #print("write now")
+            #time.sleep(30)
+            #reading = True
+
+lock.acquire()
+app = QtWidgets.QApplication(sys.argv)
+MainWindow = QtWidgets.QMainWindow()
+# whichCommand="asdf"
+# channelVlaues.volt structure
+# start a thread to read write in usb
+ui = WindowUI(MainWindow)
+MainWindow.show()
+app.exec_()
+
