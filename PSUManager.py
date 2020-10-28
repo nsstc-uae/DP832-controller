@@ -55,6 +55,21 @@ class PSUManager:
         if id == 3:
             self.channel03.turn_on(channel=3)
 
+    def switchOcpOFF(self):
+        self.channel01.ocpOFF()
+    def switchOvpOFF(self):
+        self.channel01.ovpOFF()
+    def switchOcpON(self):
+        self.channel01.ocpON()
+    def switchOvpON(self):
+        self.channel01.ovpON()
+
+    def connect(self,device):
+        self.channel01.conn(device)
+        self.channel02.conn(device)
+        self.channel03.conn(device)
+
+
     def switchChannelOff(self,id):
         #turn off channels
         if id == 1:
