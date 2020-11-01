@@ -4,33 +4,42 @@ from matplotlib import style
 import  datetime
 class Plot:
     style.use('fivethirtyeight')
-    fig = plt.figure()
-    ax1 = fig.add_subplot(1, 1, 1)
-    id=1
-    def _init_(self, id):
-        self.id=id
+    fig = None
+    ax1 = None
+    CH=1
 
-    def animate(self):
-        graph_data = open('Channel'+self.id+'.txt', 'r').read()
-        lines = graph_data.split('\n')
-        xs = []
-        ys = []
-        for line in lines:
-            if len(line) > 1:
-                x, y = line.split(',')
-                xs.append(float(x))
-                ys.append(float(y))
-        self.ax1.clear()
-        self.ax1.plot(xs, ys)
+    def startGUI(self,CH):
+        self.fig = plt.figure()
+        self.ax1 = self.fig.add_subplot(1, 1, 1)
+        self.CH=CH
+
+    def animate(self,id):
+        fn=" "
+
+        try:
+            if(self.CH==1):
+                fn = "plots/Channel1.txt"
+            elif (self.CH==2):
+                fn = "plots/Channel2.txt"
+            elif (self.CH==3):
+                fn = "plots/Channel3.txt"
+            graph_data = open(fn, 'r')
+            dt=graph_data.read()
+            lines = dt.split('\n')
+            xs = []
+            ys = []
+            for line in lines:
+                if len(line) > 1:
+                    x, y = line.split(',')
+                    xs.append(str(x))
+                    ys.append(float(y))
+            self.ax1.clear()
+            self.ax1.plot(xs, ys)
+            graph_data.close()
+        except:
+            print("file not found: "+str(self.CH))
+
+
     def startPlot(self):
         ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
         plt.show()
-
-    def savePlot(self):
-        fn = "PlotChannel"+self.id+" "+datetime.datetime.now()+".txt"
-        f = open(fn, "w")
-        with open("Channel"+self.id+".txt", 'r') as f:
-            for line in f:
-                f.write(line)
-        f.close()
-
