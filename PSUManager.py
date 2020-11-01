@@ -1,5 +1,6 @@
 import Settings as s
 import Channel as c
+from datetime import datetime
 
 class PSUManager:
 
@@ -79,13 +80,6 @@ class PSUManager:
         if id == 3:
             self.channel03.turn_off(channel=3)
 
-    # def savePresets(self):
-    #     pass
-    # def browseFiles(self):
-    #     pass
-    # def loadPresets(self):
-    #     pass
-
     def readChannels(self):
         #get values from device
         readCH1= self.channel01.getreadingsSettings()
@@ -93,10 +87,23 @@ class PSUManager:
         readCH3 = self.channel03.getreadingsSettings()
 
         readings = [readCH1, readCH2, readCH3]
+        now = datetime.now()
+
+        f = open("plots/Channel1.txt", 'a')
+        f.write(now.strftime("%H:%M:%S") + ", " +readCH1.getCurr())
+        f.write("\n")
+        f.close()
+        f = open("plots/Channel2.txt", 'a')
+        f.write(now.strftime("%H:%M:%S") + ", " +readCH2.getCurr())
+        f.write("\n")
+        f.close()
+        f = open("plots/Channel3.txt", 'a')
+        f.write(now.strftime("%H:%M:%S") + ", " +readCH3.getCurr())
+        f.write("\n")
+        f.close()
+
 
         return readings
-    def plot(self):
-        pass
 
     def configureChannel(self,v,c,ovp,ocp,id):
         #send user configurations to device
