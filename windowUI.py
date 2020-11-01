@@ -1,19 +1,12 @@
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtCore import *
-# import threading
-# from multiprocessing import Process
 from main import *
-# import serial
 import PSUManager as psu
-# import Plot
-import Settings as s
-# import Channel
-# import PlotParameters
 import time
-import datetime
 import sys
 import os
 import threading
+import Plot as plot
+import matplotlib.pyplot as plt
 reading = True
 lock = threading.Lock()
 
@@ -70,6 +63,16 @@ class WindowUI(Ui_MainWindow):
         self.ocpStateBttn_ch2.setChecked(True)
         self.ocpStateBttn_ch3.setChecked(True)
 
+
+
+        f = open("plots/Channel3.txt", 'w')
+        f.write("\n")
+        f.close()
+
+        self.plotGV_ch1.clicked.connect(self.plotStartCH1)
+        self.plotGV_ch2.clicked.connect(self.plotStartCH2)
+        self.plotGV_ch3.clicked.connect(self.plotStartCH3)
+
         self.worker = ThreadClass()
         self.workerThread = QtCore.QThread()
         self.workerThread.started.connect(self.worker.run)
@@ -103,8 +106,6 @@ class WindowUI(Ui_MainWindow):
         self.ocpStateTF_ch3.setText(str(readings[2].getOcpS()))
 
     def switchChannels(self):
-        #global reading
-       # if (reading == False):
 
         global lock
         lock.acquire()
@@ -138,7 +139,6 @@ class WindowUI(Ui_MainWindow):
 
 
 
-        #else:print("wait Reading")
 
     def browseFiles(self):
         fname = QFileDialog.getOpenFileNames(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
@@ -194,12 +194,8 @@ class WindowUI(Ui_MainWindow):
 
             print(
                 'Channel ID: ' + chID + ', Voltage: ' + chVol + ', Current: ' + chCurr + ', OVP: ' + chOVP + ', OCP: ' + chOCP)
-        # self.loadF(chID=chID, chVol=chVol, chCurr=chCurr, chOVP=chOVP, chOCP=chOCP)
 
     def writeFile(self,fn):
-        #dt = str(datetime.datetime.now())
-        #fn = "preset" + dt + ".txt"
-        ### getting channel settings
         chVol_1 = str(self.voltageSP_ch1.value())
         chCurr_1 = str(self.currentSP_ch1.value())
         chOVP_1 = str(self.ovpVolSP_ch1.value())
@@ -225,14 +221,9 @@ class WindowUI(Ui_MainWindow):
         f.write("3, " + chVol_3 + ", " + chCurr_3 + ", " + chOVP_3 + ", " + chOCP_3)
         f.close()
 
-    # def saveAs(self):
-    #     self.writeFile()
-    #     print("Save as preset")
-
     def saveAs(self):
         name = QFileDialog.getSaveFileName(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
-        #file = open(name, 'w')
-        #print(name)
+
         self.writeFile(name[0]+".txt")
         print("Save as preset")
 
@@ -240,8 +231,7 @@ class WindowUI(Ui_MainWindow):
         print("Apply selected")
 
     def setCh1(self):
-        #global reading
-        #if (reading == False):
+
         global lock
         lock.acquire()
         chVol_1 = self.voltageSP_ch1.value()
@@ -260,12 +250,7 @@ class WindowUI(Ui_MainWindow):
         self.psu.configureChannel(chVol_1, chCurr_1, chOVP_1, chOCP_1, 1)
         print("channel 1 have been set")
 
-        #else:
-            #print("wait Reading")
-
     def setCh2(self):
-        #global reading
-        #if (reading == False):
         global lock
         lock.acquire()
         chVol_2 = self.voltageSP_ch2.value()
@@ -282,14 +267,10 @@ class WindowUI(Ui_MainWindow):
         self.psu.configureChannel(chVol_2, chCurr_2, chOVP_2, chOCP_2, 2)
         print("channel 2 have been set")
 
-        #else:
-            #print("wait Reading")
 
     def setCh3(self):
         global lock
         lock.acquire()
-        #global reading
-        #if (reading == False):
         chVol_3 = self.voltageSP_ch3.value()
         chCurr_3 = self.currentSP_ch3.value()
         chOVP_3 = self.ovpVolSP_ch3.value()
@@ -304,8 +285,35 @@ class WindowUI(Ui_MainWindow):
         self.psu.configureChannel(chVol_3, chCurr_3, chOVP_3, chOCP_3, 3)
         print("channel 3 have been set")
 
-        #else:
-           # print("wait Reading")
+    def plotStartCH1 (self):
+        f = open("plots/Channel1.txt", 'w')
+        f.write("\n")
+        f.close()
+        p = plot.Plot()
+        p.startGUI(1)
+        p.animate(1)
+        p.startPlot()
+
+    def plotStartCH2 (self):
+        f = open("plots/Channel2.txt", 'w')
+        f.write("\n")
+        f.close()
+        p = plot.Plot()
+        p.startGUI(2)
+        p.animate(2)
+        p.startPlot()
+
+    def plotStartCH3 (self):
+        f = open("plots/Channel3.txt", 'w')
+        f.write("\n")
+        f.close()
+        p = plot.Plot()
+        p.startGUI(3)
+        p.animate(3)
+        p.startPlot()
+
+
+
 
 
 class ThreadClass(QtCore.QThread):
@@ -325,25 +333,15 @@ class ThreadClass(QtCore.QThread):
         while 1:
             try:
                 lock.release()
-            #print("Reading now")
                 result = self.psu.readChannels()
                 self.signalExample.emit(result)
                 time.sleep(5)
             except:
                 lock.acquire()
-            #lock.release()
-            #reading = False
-            #print("ovp:"+result[0].getOVP()+"\n ocp:"+ result[0].getOCP()+"\n curr:"+result[0].getCurr()+"\n vol:"+result[0].getVolt() )
-            #print("write now")
-            #time.sleep(30)
-            #reading = True
 
 lock.acquire()
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
-# whichCommand="asdf"
-# channelVlaues.volt structure
-# start a thread to read write in usb
 ui = WindowUI(MainWindow)
 MainWindow.show()
 app.exec_()
