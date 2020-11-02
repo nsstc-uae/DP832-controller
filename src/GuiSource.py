@@ -5,13 +5,16 @@
 # Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
+# This code was generated after creating the UI using PyQt
+# it shows the Window name and font configuration
+# as well as the Objects such as Text Fields and Buttons configuration
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
+        MainWindow.setObjectName("DP832 Controller")
         MainWindow.resize(674, 831)
         font = QtGui.QFont()
         font.setBold(False)
