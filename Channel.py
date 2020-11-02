@@ -1,5 +1,4 @@
-
-import Settings as s
+from src import Settings as s
 import time
 
 
@@ -17,20 +16,15 @@ class Channel:
     def setID(self,ID):
         self.id=ID
 
-    """Attempt to connect to instrument via files"""
-    def conn(self,device):
 
-        print("connect")
-
-
-    """write into instrument"""
+    #write into device
     def mywrite(self, message):
         self.fpwrite = open("/dev/usbtmc0", "w")
         self.fpwrite.write(message)
         self.fpwrite.flush()
         time.sleep(0.1)
         self.fpwrite.close()
-    """read from instrument"""
+    #read from device
     def myread(self,n):
         try:
             self.fpread = open("/dev/usbtmc0", "r")
@@ -44,7 +38,7 @@ class Channel:
 
 
 
-    """resets the insterument"""
+    #resets the insterumen
     def reset(self):
         self.mywrite("*RST")
         time.sleep(0.2)
@@ -65,6 +59,7 @@ class Channel:
         self.mywrite(':VOLT:PROT {v_level}'.format(v_level=v_protection_level))
         self.mywrite(':VOLT:PROT:STAT ON')
 
+    #chnnels ON/OFF
     def turn_off(self, channel):
         self.mywrite(':OUTP CH{channel},OFF'.format(channel=channel))
         self.mywrite(':VOLT:PROT:STAT OFF')
@@ -73,7 +68,7 @@ class Channel:
     def turn_on(self, channel):
         self.mywrite(':OUTP CH{channel},ON'.format(channel=channel))
 
-        #user settings
+    #user settings
     def uservoltage(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':VOLT {0}'.format(self.userSettings.getVolt()))
@@ -85,14 +80,12 @@ class Channel:
     def userOVP(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':VOLT:PROT {ovp}'.format(ovp=self.userSettings.getOVP()))
-        #self.mywrite(':VOLT:PROT:STAT ON')
 
     def userOCP(self):
         self.mywrite(':INST CH{channel}'.format(channel=int(self.id)))
         self.mywrite(':CURR:PROT {ocp}'.format(ocp=self.userSettings.getOCP()))
-        #self.mywrite(':CURR:PROT:STAT ON')
 
-
+    # OCP/CVP ON/OFF
     def ocpOFF(self):
         self.mywrite(':OUTP:PROT:STAT OFF')
 
@@ -105,7 +98,7 @@ class Channel:
     def ovpON(self):
         self.mywrite(':VOLT:PROT:STAT ON')
 
-        #reading output
+    #reading output
     def readVolt(self):
         self.mywrite(':MEAS:VOLT? CH{channel}'.format(channel=int(self.id)))
         volt = self.myread(5)
@@ -149,10 +142,12 @@ class Channel:
         state = self.myread(3)
         self.readingsSettings.setOcpS(state)
         print("ocp state:"+ state)
-        #self.readingsSettings.setOcpS(state)
 
     def getuserSettings(self,settings):
         self.userSettings = settings
+
+
+
 
     def setuserSettings(self):
         self.uservoltage()
