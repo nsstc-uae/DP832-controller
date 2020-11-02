@@ -10,15 +10,17 @@ import src.Plot as plot
 reading = True
 lock = threading.Lock()
 
+
 class WindowManager(Ui_MainWindow):
     psu = psu.PSUManager()
 
     def __init__(self, window):
         self.setupUi(window)
 
-        ##PSUManager
+        # PSUManager
         self.psu.initChannels(device="/dev/usbtmc0")
-        ##SpinBox Configure
+
+        # SpinBox Configurations
         self.voltageSP_ch1.setMaximum(30)
         self.voltageSP_ch2.setMaximum(30)
         self.voltageSP_ch3.setMaximum(5)
@@ -47,7 +49,7 @@ class WindowManager(Ui_MainWindow):
         self.ocpCurrSP_ch2.setMaximum(3.3)
         self.ocpCurrSP_ch3.setMaximum(3.3)
 
-        ##Buttons
+        # Buttons configurations
         self.browseBttn.clicked.connect(self.browseFiles)
         self.saveAsBttn.clicked.connect(self.saveAs)
         self.setBttn_ch1.clicked.connect(self.setCh1)
@@ -55,6 +57,7 @@ class WindowManager(Ui_MainWindow):
         self.setBttn_ch3.clicked.connect(self.setCh3)
         self.switchBttn_channels.clicked.connect(self.switchChannels)
 
+        # Checkbox configurations
         self.ovpStateBttn_ch1.setChecked(True)
         self.ovpStateBttn_ch2.setChecked(True)
         self.ovpStateBttn_ch3.setChecked(True)
@@ -62,16 +65,16 @@ class WindowManager(Ui_MainWindow):
         self.ocpStateBttn_ch2.setChecked(True)
         self.ocpStateBttn_ch3.setChecked(True)
 
-
-
         f = open("data/PlotParameters/Channel3.txt", 'w')
         f.write("\n")
         f.close()
 
+        # Plot Buttons
         self.plotGV_ch1.clicked.connect(self.plotStartCH1)
         self.plotGV_ch2.clicked.connect(self.plotStartCH2)
         self.plotGV_ch3.clicked.connect(self.plotStartCH3)
 
+        # Reading Thread
         self.worker = ThreadClass()
         self.workerThread = QtCore.QThread()
         self.workerThread.started.connect(self.worker.run)
@@ -79,6 +82,7 @@ class WindowManager(Ui_MainWindow):
         self.worker.moveToThread(self.workerThread)
         self.workerThread.start()
 
+    # displays the readings onto the GUI
     def readingOutput(self, readings):
         self.voltageReadingField_ch1.setText(str(readings[0].getVolt()))
         self.currentReadingField_ch1.setText(str(readings[0].getCurr()))
@@ -104,6 +108,7 @@ class WindowManager(Ui_MainWindow):
         self.ovpStateTF_ch3.setText(str(readings[2].getOvpS()))
         self.ocpStateTF_ch3.setText(str(readings[2].getOcpS()))
 
+    # Switches channels depending on which checkbox is selected
     def switchChannels(self):
 
         global lock
@@ -136,29 +141,29 @@ class WindowManager(Ui_MainWindow):
             self.psu.switchChannelOff(id=3)
             print("ch3 is off")
 
-
-
-
+    # opens a window to browse files for the preset file to be loaded
     def browseFiles(self):
         fname = QFileDialog.getOpenFileNames(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
         fpath = fname[0][0]
         print(fpath)
-        self.uploadfileTF.setText(fpath)
-        self.readF(fpath)
+        self.uploadfileTF.setText(fpath)  # displays the file path on the gui
+        self.readF(fpath)  # method to open the file
         print("browse file button")
 
+    # method to open the preset file
     def readF(self, fn):
         if fn:
             f = open(fn, 'r')
         with f:
             data = f.read()
-            self.readData(data)
+            self.readData(data)  # method to read the contents of the file
 
-    # method to read file after opening.
+    # method to read the file contents after opening
+    # and loads the preset settings onto the gui
     def readData(self, dt):
         dd = dt.splitlines()
         for line in dd:
-            contents = line.split(',')
+            contents = line.split(',')  # each line represents a channel
             try:
                 chID = contents[0]
                 chVol = contents[1]
@@ -197,7 +202,8 @@ class WindowManager(Ui_MainWindow):
             print(
                 'Channel ID: ' + chID + ', Voltage: ' + chVol + ', Current: ' + chCurr + ', OVP: ' + chOVP + ', OCP: ' + chOCP)
 
-    def writeFile(self,fn):
+    # writes a new preset file after collecting the user settings from the gui
+    def writeFile(self, fn):
         chVol_1 = str(self.voltageSP_ch1.value())
         chCurr_1 = str(self.currentSP_ch1.value())
         chOVP_1 = str(self.ovpVolSP_ch1.value())
@@ -214,7 +220,6 @@ class WindowManager(Ui_MainWindow):
         chOCP_3 = str(self.ocpCurrSP_ch3.value())
         ###
 
-
         f = open(fn, 'w')
         f.write("1, " + chVol_1 + ", " + chCurr_1 + ", " + chOVP_1 + ", " + chOCP_1)
         f.write("\n")
@@ -223,15 +228,14 @@ class WindowManager(Ui_MainWindow):
         f.write("3, " + chVol_3 + ", " + chCurr_3 + ", " + chOVP_3 + ", " + chOCP_3)
         f.close()
 
+    # opens a window where the user chooses the file location and name
     def saveAs(self):
         name = QFileDialog.getSaveFileName(None, 'Select preset file', os.getcwd(), 'All Files (*.*)')
 
-        self.writeFile(name[0]+".txt")
+        self.writeFile(name[0] + ".txt")
         print("Save as preset")
 
-    def applySelected(self):
-        print("Apply selected")
-
+    # controls the set Channel 1 button
     def setCh1(self):
 
         global lock
@@ -252,6 +256,7 @@ class WindowManager(Ui_MainWindow):
         self.psu.configureChannel(chVol_1, chCurr_1, chOVP_1, chOCP_1, 1)
         print("channel 1 have been set")
 
+    # controls the set Channel 2 button
     def setCh2(self):
         global lock
         lock.acquire()
@@ -269,7 +274,7 @@ class WindowManager(Ui_MainWindow):
         self.psu.configureChannel(chVol_2, chCurr_2, chOVP_2, chOCP_2, 2)
         print("channel 2 have been set")
 
-
+    # controls the set Channel 3 button
     def setCh3(self):
         global lock
         lock.acquire()
@@ -287,7 +292,8 @@ class WindowManager(Ui_MainWindow):
         self.psu.configureChannel(chVol_3, chCurr_3, chOVP_3, chOCP_3, 3)
         print("channel 3 have been set")
 
-    def plotStartCH1 (self):
+    # makes the plot for channel 1
+    def plotStartCH1(self):
         f = open("data/PlotParameters/Channel1.txt", 'w')
         f.write("\n")
         f.close()
@@ -296,7 +302,8 @@ class WindowManager(Ui_MainWindow):
         p.animate(1)
         p.startPlot()
 
-    def plotStartCH2 (self):
+    # makes the plot for channel 2
+    def plotStartCH2(self):
         f = open("data/PlotParameters/Channel2.txt", 'w')
         f.write("\n")
         f.close()
@@ -305,7 +312,8 @@ class WindowManager(Ui_MainWindow):
         p.animate(2)
         p.startPlot()
 
-    def plotStartCH3 (self):
+    # makes the plot for channel 3
+    def plotStartCH3(self):
         f = open("data/PlotParameters/Channel3.txt", 'w')
         f.write("\n")
         f.close()
@@ -315,9 +323,7 @@ class WindowManager(Ui_MainWindow):
         p.startPlot()
 
 
-
-
-
+# Working Thread class
 class ThreadClass(QtCore.QThread):
     signalExample = QtCore.pyqtSignal(object)
     psu = psu.PSUManager()
@@ -325,7 +331,6 @@ class ThreadClass(QtCore.QThread):
 
     def __init__(self):
         super().__init__()
-
 
     @QtCore.pyqtSlot()
     def run(self):
@@ -340,10 +345,11 @@ class ThreadClass(QtCore.QThread):
             except:
                 lock.acquire()
 
+
+# main
 lock.acquire()
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
 ui = WindowManager(MainWindow)
 MainWindow.show()
 app.exec_()
-
