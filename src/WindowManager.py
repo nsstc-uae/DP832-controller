@@ -1,20 +1,19 @@
 from PyQt5.QtWidgets import QFileDialog
-from main import *
-import PSUManager as psu
+from src.GuiSource import *
+from src import PSUManager as psu
 import time
 import sys
 import os
 import threading
-import Plot as plot
-import matplotlib.pyplot as plt
+import src.Plot as plot
+
 reading = True
 lock = threading.Lock()
 
-class WindowUI(Ui_MainWindow):
+class WindowManager(Ui_MainWindow):
     psu = psu.PSUManager()
 
     def __init__(self, window):
-        #lock.acquire()
         self.setupUi(window)
 
         ##PSUManager
@@ -65,7 +64,7 @@ class WindowUI(Ui_MainWindow):
 
 
 
-        f = open("plots/Channel3.txt", 'w')
+        f = open("data/PlotParameters/Channel3.txt", 'w')
         f.write("\n")
         f.close()
 
@@ -160,11 +159,14 @@ class WindowUI(Ui_MainWindow):
         dd = dt.splitlines()
         for line in dd:
             contents = line.split(',')
-            chID = contents[0]
-            chVol = contents[1]
-            chCurr = contents[2]
-            chOVP = contents[3]
-            chOCP = contents[4]
+            try:
+                chID = contents[0]
+                chVol = contents[1]
+                chCurr = contents[2]
+                chOVP = contents[3]
+                chOCP = contents[4]
+            except:
+                print("invalid preset file")
             if chID == "1":
                 self.setStateBttn_ch1.setChecked(True)
                 self.voltageSP_ch1.setValue(float(chVol))
@@ -286,7 +288,7 @@ class WindowUI(Ui_MainWindow):
         print("channel 3 have been set")
 
     def plotStartCH1 (self):
-        f = open("plots/Channel1.txt", 'w')
+        f = open("data/PlotParameters/Channel1.txt", 'w')
         f.write("\n")
         f.close()
         p = plot.Plot()
@@ -295,7 +297,7 @@ class WindowUI(Ui_MainWindow):
         p.startPlot()
 
     def plotStartCH2 (self):
-        f = open("plots/Channel2.txt", 'w')
+        f = open("data/PlotParameters/Channel2.txt", 'w')
         f.write("\n")
         f.close()
         p = plot.Plot()
@@ -304,7 +306,7 @@ class WindowUI(Ui_MainWindow):
         p.startPlot()
 
     def plotStartCH3 (self):
-        f = open("plots/Channel3.txt", 'w')
+        f = open("data/PlotParameters/Channel3.txt", 'w')
         f.write("\n")
         f.close()
         p = plot.Plot()
@@ -323,7 +325,6 @@ class ThreadClass(QtCore.QThread):
 
     def __init__(self):
         super().__init__()
-        self.psu.connect(device="/dev/usbtmc0")
 
 
     @QtCore.pyqtSlot()
@@ -342,7 +343,7 @@ class ThreadClass(QtCore.QThread):
 lock.acquire()
 app = QtWidgets.QApplication(sys.argv)
 MainWindow = QtWidgets.QMainWindow()
-ui = WindowUI(MainWindow)
+ui = WindowManager(MainWindow)
 MainWindow.show()
 app.exec_()
 
