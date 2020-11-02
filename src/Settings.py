@@ -1,10 +1,10 @@
 class Settings:
+
     voltage = ""
     current= ""
     ovp = ""
     ocp= ""
     state= ""
-
     ovpState=""
     ocpState=""
 
@@ -16,11 +16,9 @@ class Settings:
         self.ocp=ocp
         self.state=state
 
-
+    #getters
     def getChannelState(self):
         return self.state
-
-
     def getVolt(self):
         return self.voltage
     def getCurr(self):
@@ -34,6 +32,7 @@ class Settings:
     def getOvpS(self):
         return self.ovpState
 
+    #setters
     def setChannelState(self,state):
         self.state=state
     def setVolt(self,volt):
