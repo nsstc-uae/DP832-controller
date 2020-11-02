@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
-import  datetime
+
 class Plot:
     style.use('fivethirtyeight')
     fig = None
@@ -18,11 +18,11 @@ class Plot:
 
         try:
             if(self.CH==1):
-                fn = "plots/Channel1.txt"
+                fn = "data/PlotParameters/Channel1.txt"
             elif (self.CH==2):
-                fn = "plots/Channel2.txt"
+                fn = "data/PlotParameters/Channel2.txt"
             elif (self.CH==3):
-                fn = "plots/Channel3.txt"
+                fn = "data/PlotParameters/Channel3.txt"
             graph_data = open(fn, 'r')
             dt=graph_data.read()
             lines = dt.split('\n')
@@ -43,3 +43,5 @@ class Plot:
     def startPlot(self):
         ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
         plt.show()
+
+
