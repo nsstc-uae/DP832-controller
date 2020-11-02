@@ -2,29 +2,30 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 
+
 class Plot:
     style.use('fivethirtyeight')
     fig = None
     ax1 = None
-    CH=1
+    CH = 1
 
-    def startGUI(self,CH):
+    def startGUI(self, CH):
         self.fig = plt.figure()
         self.ax1 = self.fig.add_subplot(1, 1, 1)
-        self.CH=CH
+        self.CH = CH
 
-    def animate(self,id):
-        fn=" "
+    def animate(self, id):
+        fn = " "
 
         try:
-            if(self.CH==1):
+            if (self.CH == 1):
                 fn = "data/PlotParameters/Channel1.txt"
-            elif (self.CH==2):
+            elif (self.CH == 2):
                 fn = "data/PlotParameters/Channel2.txt"
-            elif (self.CH==3):
+            elif (self.CH == 3):
                 fn = "data/PlotParameters/Channel3.txt"
             graph_data = open(fn, 'r')
-            dt=graph_data.read()
+            dt = graph_data.read()
             lines = dt.split('\n')
             xs = []
             ys = []
@@ -37,11 +38,8 @@ class Plot:
             self.ax1.plot(xs, ys)
             graph_data.close()
         except:
-            print("file not found: "+str(self.CH))
-
+            print("file not found: " + str(self.CH))
 
     def startPlot(self):
         ani = animation.FuncAnimation(self.fig, self.animate, interval=1000)
         plt.show()
-
-
