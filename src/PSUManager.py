@@ -1,5 +1,4 @@
-import Settings as s
-import Channel as c
+from src import Settings as s, Channel as c
 from datetime import datetime
 
 class PSUManager:
@@ -18,18 +17,8 @@ class PSUManager:
     channel03 = c.Channel()
     channel03.setID(3)
 
-    def _init_(self):
-        pass
 
-    def initUI(self):
-        pass
-
-
-    def initChannels(self,device):
-        #starting connection to device channel
-        self.channel01.conn(device)
-        self.channel02.conn(device)
-        self.channel03.conn(device)
+    def initChannels(self):
 
         #reset channels
         self.channel01.reset()
@@ -56,20 +45,6 @@ class PSUManager:
         if id == 3:
             self.channel03.turn_on(channel=3)
 
-    def switchOcpOFF(self):
-        self.channel01.ocpOFF()
-    def switchOvpOFF(self):
-        self.channel01.ovpOFF()
-    def switchOcpON(self):
-        self.channel01.ocpON()
-    def switchOvpON(self):
-        self.channel01.ovpON()
-
-    def connect(self,device):
-        self.channel01.conn(device)
-        self.channel02.conn(device)
-        self.channel03.conn(device)
-
 
     def switchChannelOff(self,id):
         #turn off channels
@@ -80,6 +55,16 @@ class PSUManager:
         if id == 3:
             self.channel03.turn_off(channel=3)
 
+    #OCP/OVP ON/OFF
+    def switchOcpOFF(self):
+        self.channel01.ocpOFF()
+    def switchOvpOFF(self):
+        self.channel01.ovpOFF()
+    def switchOcpON(self):
+        self.channel01.ocpON()
+    def switchOvpON(self):
+        self.channel01.ovpON()
+
     def readChannels(self):
         #get values from device
         readCH1= self.channel01.getreadingsSettings()
@@ -87,17 +72,19 @@ class PSUManager:
         readCH3 = self.channel03.getreadingsSettings()
 
         readings = [readCH1, readCH2, readCH3]
+
+        #get time and save time and current to file for the plot
         now = datetime.now()
 
-        f = open("plots/Channel1.txt", 'a')
+        f = open("data/PlotParameters/Channel1.txt", 'a')
         f.write(now.strftime("%H:%M:%S") + ", " +readCH1.getCurr())
         f.write("\n")
         f.close()
-        f = open("plots/Channel2.txt", 'a')
+        f = open("data/PlotParameters/Channel2.txt", 'a')
         f.write(now.strftime("%H:%M:%S") + ", " +readCH2.getCurr())
         f.write("\n")
         f.close()
-        f = open("plots/Channel3.txt", 'a')
+        f = open("data/PlotParameters/Channel3.txt", 'a')
         f.write(now.strftime("%H:%M:%S") + ", " +readCH3.getCurr())
         f.write("\n")
         f.close()
