@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget, QVBoxLayout, QLineEdit, QLabel, QPushButton
+
 from src.GuiSource import *
 from src import PSUManager as psu
 import time
@@ -7,18 +8,27 @@ import os
 import threading
 import src.Plot as plot
 
+from src.DBconfig import Ui_DBWindow
+
 reading = True
 lock = threading.Lock()
-
+connectDB = ""
+connectState = 0
 
 class WindowManager(Ui_MainWindow):
     psu = psu.PSUManager()
 
+    # connectDB = ""
     def __init__(self, window):
+        self.dbWindow = DBconfig()
+        self.popupDB()
+        # if (self.connectDB == "&OK"):
+        #
+        #     self.DBinfo()
         self.setupUi(window)
 
         # PSUManager
-        self.psu.initChannels(device="/dev/usbtmc0")
+        self.psu.initChannels()
 
         # SpinBox Configurations
         self.voltageSP_ch1.setMaximum(30)
@@ -321,6 +331,106 @@ class WindowManager(Ui_MainWindow):
         p.startGUI(3)
         p.animate(3)
         p.startPlot()
+
+    def popupDB(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("Database information")
+        msg.setText("would you like to save the current and time data to database?")
+        msg.setStandardButtons(QMessageBox.No | QMessageBox.Ok)
+        msg.buttonClicked.connect(self.popup_button)
+        x = msg.exec_()
+
+    def popup_button(self, i):
+        self.connectDB = i.text()
+        # self.DBinfo()
+        print(i.text())
+
+    # def CheckDBfile(self):
+    #     fn='data/DatabaseInformation/DBinfo.txt'
+    #     if os.path.getsize(fn)==0:
+    #         return False
+    #     else:
+    #         return True
+
+
+    # def DBinfo(self):
+    #     self.dbWindow.displayWindow()
+        # """Launch the employee dialog."""
+        # MainWindow = QtWidgets.QMainWindow()
+        #
+        # self.DBwindow = DBconfig(MainWindow)
+        # self.DBwindow.displaywindow()
+
+        # Window = QtWidgets.QMainWindow()
+        # ui = DBconfig(MainWindow)
+        # MainWindow.show()
+        # dlg = DBconfig(self)
+        # dlg.exec()
+
+
+# class DBconfig(QDialog):
+#     """Employee dialog."""
+#     def __init__(self, parent=None):
+#         super().__init__(None)
+#         # Create an instance of the GUI
+#         self.ui = Ui_Dialog()
+#         # Run the .setupUi() method to show the GUI
+#
+#         self.ui.setupUi(self)
+
+class DBconfig(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedHeight(500)
+        self.setFixedWidth(500)
+        self.setWindowTitle("Database info.")
+        mainlayout = QVBoxLayout()
+        self.setStyleSheet("""
+            QLineEdit{hight: 40px: font-size: 30px}
+            QLable{font-size: 30px)
+        """)
+
+        self.dbName = QLineEdit()
+        self.username = QLineEdit()
+        self.password = QLineEdit()
+        self.tableName = QLineEdit()
+        mainlayout.addWidget(QLabel('Database name:'))
+        mainlayout.addWidget(self.dbName)
+        mainlayout.addWidget(QLabel('User:'))
+        mainlayout.addWidget(self.username)
+        mainlayout.addWidget(QLabel('password:'))
+        mainlayout.addWidget(self.password)
+        mainlayout.addWidget(QLabel('Table name:'))
+        mainlayout.addWidget(self.tableName)
+
+        self.confirm = QPushButton('Confirm')
+        self.confirm.setStyleSheet('font-size: 15px')
+        mainlayout.addWidget(self.confirm)
+        self.confirm.clicked.connect(self.sendDataToFile)
+
+        self.cancel = QPushButton('Cancel')
+        self.cancel.setStyleSheet('font-size: 15px')
+        self.cancel.clicked.connect(self.wclose)
+        mainlayout.addWidget(self.cancel)
+        self.setLayout(mainlayout)
+
+    def displayWindow(self):
+        self.show()
+
+    def wclose(self):
+        self.Startconnect = "No"
+        self.close()
+
+    def sendDataToFile(self):
+        fn = "data/DatabaseInformation/DBinfo.txt"
+        f = open(fn, 'w')
+        DBName = self.dbName.text()
+        passw = self.password.text()
+        user = self.username.text()
+        table = self.tableName.text()
+        f.write(DBName + ", " + passw + ", " + user + ", " + table + "")
+        f.write("\n")
+        f.close()
 
 
 # Working Thread class
