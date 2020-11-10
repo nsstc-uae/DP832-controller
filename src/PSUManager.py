@@ -1,4 +1,4 @@
-from src import Settings as s, Channel as c
+from src import Settings as s, Channel as c, DBconnection as dpconnect
 from datetime import datetime
 
 
@@ -16,6 +16,8 @@ class PSUManager:
     channel02.setID(2)
     channel03 = c.Channel()
     channel03.setID(3)
+
+    database = dpconnect.connection()
 
     def initChannels(self):
 
@@ -88,6 +90,9 @@ class PSUManager:
         f.write(now.strftime("%H:%M:%S") + ", " + readCH3.getCurr())
         f.write("\n")
         f.close()
+        self.database.connect(current=readCH1.getCurr(), channel="1", voltage=readCH1.getVolt())
+        self.database.connect(current=readCH2.getCurr(), channel="2", voltage=readCH2.getVolt())
+        self.database.connect(current=readCH3.getCurr(), channel="3", voltage=readCH3.getVolt())
 
         return readings
 
