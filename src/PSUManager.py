@@ -67,7 +67,7 @@ class PSUManager:
     def switchOvpON(self):
         self.channel01.ovpON()
 
-    def readChannels(self):
+    def readChannels(self, connectState):
         # get values from device
         readCH1 = self.channel01.getReadingsSettings()
         readCH2 = self.channel02.getReadingsSettings()
@@ -90,10 +90,17 @@ class PSUManager:
         f.write(now.strftime("%H:%M:%S") + ", " + readCH3.getCurr())
         f.write("\n")
         f.close()
-        self.database.connect(current=readCH1.getCurr(), channel="1", voltage=readCH1.getVolt())
-        self.database.connect(current=readCH2.getCurr(), channel="2", voltage=readCH2.getVolt())
-        self.database.connect(current=readCH3.getCurr(), channel="3", voltage=readCH3.getVolt())
-
+        if connectState == True:
+            try:
+                info = self.readDBinfo()
+                print("DB: "+info[0]+" pass: "+info[1]+" user: "+info[2]+" table: "+info[3])
+                self.database.connect(current=readCH1.getCurr(), channel="1", voltage=readCH1.getVolt(), db = info[0], passw = info[1], user = info[2], table = info[3])
+                self.database.connect(current=readCH2.getCurr(), channel="2", voltage=readCH2.getVolt(), db = info[0], passw = info[1], user = info[2], table = info[3])
+                self.database.connect(current=readCH3.getCurr(), channel="3", voltage=readCH3.getVolt(), db = info[0], passw = info[1], user = info[2], table = info[3])
+            except:
+                print("somthing wrong happened when connecting to DB")
+        else:
+            print("connect State OFF")
         return readings
 
     def configureChannel(self, v, c, ovp, ocp, id):
@@ -108,5 +115,20 @@ class PSUManager:
             self.userSettingsCH3.setAll(v, c, ovp, ocp)
             self.channel03.setUserSettings()
 
-    def sendToDB(self):
-        pass
+    def readDBinfo(self):
+        fn = "data/DatabaseInformation/DBinfo.txt"
+        f = open(fn, 'r')
+        dt = f.read()
+        dd = dt.splitlines()
+        f.close()
+        for line in dd:
+            contents = line.split(',')  # each line represents a channel
+            try:
+                dbName = contents[0]
+                password = contents[1]
+                username = contents[2]
+                tableName = contents[3]
+            except:
+                print("invalid Database file")
+
+        return contents
