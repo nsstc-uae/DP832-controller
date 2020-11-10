@@ -3,12 +3,12 @@ from mysql.connector import Error
 class connection:
     cursor=None
     connection=None
-    def connect(self,current, channel, voltage):
+    def connect(self,current, channel, voltage, db, passw, user, table):
         try:
             self.connection = mysql.connector.connect(host='localhost',
-                                                database='psuDB',
-                                                user='root',
-                                                password='password11')
+                                                database=db,
+                                                user=user,
+                                                password=passw)
             if self.connection.is_connected():
                 dp_Info= self.connection.get_server_info()
                 print("Connection to MySQL server version ", dp_Info)
@@ -16,7 +16,7 @@ class connection:
                 self.cursor.execute("use psuDB;")
                 self.connection.commit()
                 mySqlQuery = (
-                    "INSERT INTO results (Channel, Time, Current, Voltage) "
+                    "INSERT INTO "+table+" (Channel, Time, Current, Voltage) "
                     "VALUES ("+channel+" , NOW(), "+current+", "+voltage+");")
                 #data = (channel, current, voltage)
                 self.cursor.execute(mySqlQuery)
