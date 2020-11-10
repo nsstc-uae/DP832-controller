@@ -13,7 +13,7 @@ from src.DBconfig import Ui_DBWindow
 reading = True
 lock = threading.Lock()
 connectDB = ""
-connectState = 0
+connectState = False
 
 class WindowManager(Ui_MainWindow):
     psu = psu.PSUManager()
@@ -22,9 +22,15 @@ class WindowManager(Ui_MainWindow):
     def __init__(self, window):
         self.dbWindow = DBconfig()
         self.popupDB()
-        # if (self.connectDB == "&OK"):
-        #
-        #     self.DBinfo()
+        global connectState
+        #if user wants to connect to database:
+        if (self.connectDB == "&OK"):
+            connectState = True
+            #if they never entered the DB info before opern DB info window:
+            if self.CheckDBfile():
+                print(self.CheckDBfile())
+                self.DBinfo()
+
         self.setupUi(window)
 
         # PSUManager
@@ -345,40 +351,20 @@ class WindowManager(Ui_MainWindow):
         # self.DBinfo()
         print(i.text())
 
-    # def CheckDBfile(self):
-    #     fn='data/DatabaseInformation/DBinfo.txt'
-    #     if os.path.getsize(fn)==0:
-    #         return False
-    #     else:
-    #         return True
+    def CheckDBfile(self):
+        fn = 'data/DatabaseInformation/DBinfo.txt'
+        if os.path.getsize(fn) == 0:
+            return True
+        else:
+            return False
+
+    def DBinfo(self):
+        self.dbWindow.displayWindow()
 
 
-    # def DBinfo(self):
-    #     self.dbWindow.displayWindow()
-        # """Launch the employee dialog."""
-        # MainWindow = QtWidgets.QMainWindow()
-        #
-        # self.DBwindow = DBconfig(MainWindow)
-        # self.DBwindow.displaywindow()
-
-        # Window = QtWidgets.QMainWindow()
-        # ui = DBconfig(MainWindow)
-        # MainWindow.show()
-        # dlg = DBconfig(self)
-        # dlg.exec()
-
-
-# class DBconfig(QDialog):
-#     """Employee dialog."""
-#     def __init__(self, parent=None):
-#         super().__init__(None)
-#         # Create an instance of the GUI
-#         self.ui = Ui_Dialog()
-#         # Run the .setupUi() method to show the GUI
-#
-#         self.ui.setupUi(self)
 
 class DBconfig(QWidget):
+    global connectState
     def __init__(self):
         super().__init__()
         self.setFixedHeight(500)
@@ -418,7 +404,7 @@ class DBconfig(QWidget):
         self.show()
 
     def wclose(self):
-        self.Startconnect = "No"
+        self.connectState = False
         self.close()
 
     def sendDataToFile(self):
@@ -428,9 +414,11 @@ class DBconfig(QWidget):
         passw = self.password.text()
         user = self.username.text()
         table = self.tableName.text()
-        f.write(DBName + ", " + passw + ", " + user + ", " + table + "")
+        f.write(DBName + "," + passw + "," + user + "," + table)
         f.write("\n")
         f.close()
+        self.close()
+
 
 
 # Working Thread class
@@ -445,11 +433,12 @@ class ThreadClass(QtCore.QThread):
     @QtCore.pyqtSlot()
     def run(self):
         global lock
+        global connectState
 
         while 1:
             try:
                 lock.release()
-                result = self.psu.readChannels()
+                result = self.psu.readChannels(connectState)
                 self.signalExample.emit(result)
                 time.sleep(5)
             except:
