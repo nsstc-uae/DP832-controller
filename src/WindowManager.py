@@ -341,7 +341,7 @@ class WindowManager(Ui_MainWindow):
     def popupDB(self):
         msg = QMessageBox()
         msg.setWindowTitle("Database information")
-        msg.setText("would you like to save the current and time data to database?")
+        msg.setText("Would you like to save the current, voltage and time data to the database?")
         msg.setStandardButtons(QMessageBox.No | QMessageBox.Ok)
         msg.buttonClicked.connect(self.popup_button)
         x = msg.exec_()
